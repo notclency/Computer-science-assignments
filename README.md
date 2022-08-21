@@ -2,7 +2,7 @@
 All my assignments and projects during my 4 year college period.
 
 GENERAL OVERVIEW:
-Students will increase their knowledge of problem solving, specifically
+-  Students will increase their knowledge of problem solving, specifically
 in the areas of problem solving strategies and problem decomposition, modular design,
 design of data structures and algorithms, and testing. Students will learn more advanced
 programming techniques, including dynamic allocation and recursion. Object-oriented

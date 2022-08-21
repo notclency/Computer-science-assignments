@@ -1,0 +1,1743 @@
+Script started on 2022-04-08 22:41:19-06:00
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p3> ls -al
+total 100
+drwxr-xr-x 2 ctabe297 students.pg 4096 Apr  8 22:41 .
+drwxr-xr-x 5 ctabe297 students.pg   54 Apr  8 22:29 ..
+-rw-r--r-- 1 ctabe297 students.pg  657 Apr  8 16:27 EquTriangle.cpp
+-rw-r--r-- 1 ctabe297 students.pg 1844 Apr  8 16:27 EquTriangle.h
+-rw-r--r-- 1 ctabe297 students.pg  131 Mar 29 16:37 globals.h
+-rw-r--r-- 1 ctabe297 students.pg 2473 Mar 29 16:35 Grid.cpp
+-rw-r--r-- 1 ctabe297 students.pg  407 Mar 29 16:35 Grid.h
+-rw-r--r-- 1 ctabe297 students.pg 5759 Apr  1 13:13 ioutil.cpp
+-rw-r--r-- 1 ctabe297 students.pg 4254 Apr  1 13:13 ioutil.h
+-rw-r--r-- 1 ctabe297 students.pg 1041 Apr  8 16:26 IsoTriangle.cpp
+-rw-r--r-- 1 ctabe297 students.pg 2520 Apr  8 16:01 IsoTriangle.h
+-rw-r--r-- 1 ctabe297 students.pg 8977 Apr  8 19:52 main.cpp
+-rw-r--r-- 1 ctabe297 students.pg  456 Apr  8 22:33 makefile
+-rw-r--r-- 1 ctabe297 students.pg 1831 Apr  8 15:59 Rectangle.cpp
+-rw-r--r-- 1 ctabe297 students.pg 2372 Apr  8 16:00 Rectangle.h
+-rw-r--r-- 1 ctabe297 students.pg 7430 Apr  8 19:27 Shape_Collection.cpp
+-rw-r--r-- 1 ctabe297 students.pg 3271 Mar 29 16:35 Shape_Collection.h
+-rw-r--r-- 1 ctabe297 students.pg  746 Apr  4 21:21 Shape.cpp
+-rw-r--r-- 1 ctabe297 students.pg  579 Apr  8 11:43 Shape.h
+-rw-r--r-- 1 ctabe297 students.pg 1093 Apr  8 16:25 Square.cpp
+-rw-r--r-- 1 ctabe297 students.pg 1718 Apr  8 16:26 Square.h
+-rw-r--r-- 1 ctabe297 students.pg    0 Apr  8 22:41 typescript
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p3> cat makefile main.cpp Shape.h Shape.cpp Rectanglee.h Rectangle.cpp Square.h Square.cpp IsoTriangle.h IsoTriangle.cpp EquTriangle.h EquTriangle.cppp 
+RUN = paint
+SOURCES = main.cpp Grid.cpp Grid.h Shape.cpp Shape.h Shape_Collection.cpp Shape_Collection.h Rectangle.cpp Rectangle.h Square.cpp Square.h IsoTriangle.cpp IsoTriangle.h EquTriangle.cpp EquTriangle.h ioutil.cpp ioutil.h
+MODULES = $(SOURCES: .cpp = .o)
+CPPFLAGS = -ansi -pedantic-errors -Wall -Wconversion -g
+
+$(RUN): $(MODULES)
+	g++ $(MODULES) $(CPPFLAGS) -o $(RUN)
+
+clean:
+	/bin/rm -f *.o $(TESTS) $(RUN) *.*~ *.g*
+
+all:	clean $(RUN)
+	./$(RUN)
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+#include "Grid.h"
+#include "Shape.h"
+#include "Rectangle.h"
+#include "Square.h"
+#include "IsoTriangle.h"
+#include "EquTriangle.h"
+#include "Shape_Collection.h"
+#include "ioutil.h"
+
+#define QUIT 'q'
+#define ADD 'a'
+#define DELETE 'd'
+#define MOVE 'm'
+
+void show_menu();
+
+string getShapeName();
+void getUpperLeft (int& xtop, int& ytop);
+int getWidth();
+int getHeight();
+char getShapeType();
+
+void doAdd (Shape_Collection& shapes);
+void doDelete (Shape_Collection& shapes);
+void doMove (Shape_Collection& shapes);
+bool doQuit ();
+void eof_message();
+
+int main()
+{
+
+  /********************************************************************
+   *
+   * Name:             Clency Tabe
+   * Email:            ctabe297@mtroyal.ca
+   * Course:           COMP 1633, 001
+   * Due Date:         April 8, 2022
+   * Instructor name:  Paul Pospisil
+   * File name:        main.cpp
+   * 
+   * Purpose:          Display menu options to user and uses files in
+   *                   current directory to accomplish certain tasks.
+   * Details:          Uses all files in current directory to draw certain
+   *                   shapes on a grid.
+   *
+   ********************************************************************/
+  
+  Shape_Collection myShapes;
+  char choice;
+  char choiceStr[2];
+  bool done = false;
+  bool eof = false;
+
+  do
+  {
+    myShapes.write_names (cout);
+    cout << endl;
+    myShapes.draw_shapes(cout);
+    show_menu();
+    readString("Please enter choice: ", choiceStr, 1, 1, eof);
+    if (eof)
+    {
+      eof_message();
+    }
+    else
+    {
+      choice = choiceStr[0];
+    }
+    switch (choice)
+    {
+    case ADD:    doAdd (myShapes);
+      break;
+    case DELETE: doDelete (myShapes);
+      break;
+    case MOVE:   doMove (myShapes);
+      break;
+    case QUIT:   done = doQuit ();
+      break;
+    default:     cout << choice << " is unknown command" << endl;
+      break;
+    }
+  }
+  while (!done);
+
+  return 0;
+}
+
+
+void show_menu()
+{
+  cout << "Options:  a(dd shape)" << endl;
+  cout << "          d(elete) shape" << endl;
+  cout << "          m(ove) shape" << endl;
+  cout << "          q(uit) paint program" << endl;
+  return;
+}
+
+void getUpperLeft (int& xtop, int& ytop)
+{
+  bool eof;
+
+  do
+  {
+    xtop = readInt ("Enter x coordinate for upper left corner of bounding box: ", eof);
+    if (eof)
+    {
+      eof_message();
+    }
+  } while (eof);
+
+  do
+  {
+    ytop = readInt ("Enter y coordinate for upper left corner of bounding box: ", eof);
+    if (eof)
+    {
+      eof_message();
+    }
+  } while (eof);
+    
+  return;
+}
+
+/******************************************************************
+ *
+ * Function: getWidth
+ *
+ * Purpose: reads and returns a width (interger)
+ *
+ * INPUT: NONE
+ *
+ * OUTPUT: returns the width (interger)
+ *
+ ******************************************************************/
+
+int getWidth ()
+{
+  int width;
+  bool invalid = true;
+  bool eof;
+
+  do{
+    width = readInt("Enter width: ", eof);
+    if(eof)
+      {
+	eof_message();
+      }
+    if(width >= 1)
+      {
+	invalid = false;
+      }else
+      {
+	cout << "ERROR - Width most be greater than 0" << endl;
+      }
+  } while (eof || invalid);
+  
+  return width;
+}
+
+/******************************************************************
+ *
+ * Function: getHeight
+ *
+ * Purpose: reads and returns a Height (interger)
+ *
+ * INPUT: NONE
+ *
+ * OUTPUT: returns the Height (interger)
+ *
+ ******************************************************************/
+
+int getHeight ()
+{
+  int height;
+  int invalid = true;
+  bool eof;
+  
+
+  do{
+    height = readInt("Enter height: ", eof);
+    if(eof)
+      {
+	eof_message();
+      }
+    if(height >= 1)
+      {
+	invalid = false;
+      }else
+      {
+	cout << "ERROR - Height most be greater than 0" << endl;
+      }
+  } while (eof || invalid);
+  
+  return height;
+}
+
+/******************************************************************
+ *
+ * Function: getShapeType
+ *
+ * Purpose: reads and returns a ShapeType (char)
+ *
+ * INPUT: NONE
+ *
+ * OUTPUT: returns the ShapeType (char)
+ *
+ ******************************************************************/
+
+char getShapeType ()
+{
+
+  bool eof;
+  char shapeTypeStr[2];
+  char shapeType;
+  
+  do{
+    cout << "Options:  r(ectanle) shape" << endl;
+    cout << "          s(square) shape" << endl;
+    cout << "          i(soceles traingle) shape" << endl;
+    cout << "          e(quilateral triangle) shape" << endl << endl;
+
+    readString("Choice: ",  shapeTypeStr, 1, 1, eof);
+    if(eof){
+      eof_message();
+    }else{
+      shapeType = shapeTypeStr[0];
+    }
+    
+  } while (eof);
+  
+  return shapeType;
+}
+
+
+/******************************************************************
+ *
+ * Function: getShapeName
+ *
+ * Purpose: reads and returns a ShapeName (string)
+ *
+ * INPUT: NONE
+ *
+ * OUTPUT: returns the shapeName (string)
+ *
+ ******************************************************************/
+
+string getShapeName()
+{
+  string result;
+  char ch;
+  bool eof;
+
+  do
+    {
+      eof = false;
+      cout << "Please enter shape name (no blanks): ";
+      cin >> result;
+      if (cin.eof())
+	{
+	  eof = true;
+	  cin.clear();
+	  cin.putback(' ');
+	  cin.get(ch);
+	  eof_message();
+	}
+    } while (eof);
+
+  do
+    {
+      cin.get(ch);
+    } while (ch != '\n');
+  
+  return result;
+}
+
+
+/******************************************************************
+ *
+ * Function: doMove
+ *
+ * Purpose: moves a shape (if it exist).
+ *
+ * INPUT: Shape_Collection  - passed by refernce
+ *
+ * OUTPUT: Updated Shape_Collection
+ *
+ ******************************************************************/
+ 
+void doMove (Shape_Collection& myShapes)
+{
+
+  string shapeName;
+  Shape *yourShape;
+  int new_left;
+  int new_upper;
+  
+  shapeName = getShapeName();
+  yourShape = myShapes.lookup(shapeName);
+
+  if(yourShape == NULL){
+    cout << endl << "ERROR - Shape name doesn't exist in shape collection" << endl;
+  }else{
+    getUpperLeft(new_left, new_upper);
+    yourShape->move(new_left, new_upper);
+  }
+  
+  return;
+}
+
+
+/******************************************************************
+ *
+ * Function: doDelete
+ *
+ * Purpose: deletes a shape (if it exist).
+ *
+ * INPUT: Shape_Collection  - passed by refernce
+ *
+ * OUTPUT: Updated Shape_Collection
+ *
+ ******************************************************************/
+ 
+void doDelete (Shape_Collection& myShapes)
+{
+
+  string shapeName;
+  Shape *yourShape;
+  
+  shapeName = getShapeName();
+  yourShape  = myShapes.lookup(shapeName);
+
+  if(yourShape != NULL){
+    myShapes.remove(shapeName);
+  }else{
+    cout << endl << "ERROR - Shape name doesn't exist in shape collection" << endl;
+  }
+  
+  return;
+}
+
+
+/******************************************************************
+ *
+ * Function: doAdd
+ *
+ * Purpose: adds a new shape (if it's name doesnt't exist
+ *         in shape collection).
+ *
+ * INPUT: Shape_Collection  - passed by refernce
+ *
+ * OUTPUT: Updated Shape_Collection
+ *
+ ******************************************************************/
+ 
+void doAdd (Shape_Collection& myShapes)
+{
+  char rectangleType  = 'r';
+  char squareType  = 's';
+  char isoTriangleType  = 'i';
+  char equTriangleType  = 'e';
+
+  int left;
+  int upper;
+  int width;
+  int height;
+
+  string shapeName;
+  
+  Square *aSquare;
+  Rectangle *aRectangle;
+  IsoTriangle *isoTriangle;
+  EquTriangle *equTriangle;
+
+  Shape *yourShape;
+  
+  char shapeType;
+    
+  shapeName = getShapeName();
+  yourShape = myShapes.lookup(shapeName);
+  
+  if(yourShape != NULL){
+    cout << endl << "ERROR - Shape name already exist in shape collection" << endl << endl;
+  }else{
+    
+    shapeType = getShapeType();
+    if(shapeType != rectangleType &&
+       shapeType != squareType &&
+       shapeType != isoTriangleType &&
+       shapeType != equTriangleType){
+      
+      cout << endl << "ERROR - Invalid shape type - (r,s,i,e)" << endl << endl;
+    }else{
+      getUpperLeft(left, upper);
+
+      width = getWidth();
+
+      if(shapeType == rectangleType || shapeType == isoTriangleType){
+
+	height = getHeight();
+
+	if(shapeType == rectangleType){
+
+	  aRectangle = new Rectangle(left, upper, width, height);
+	  myShapes.add(aRectangle, shapeName);
+	}else{
+
+	  isoTriangle = new IsoTriangle(left, upper, width, height);
+	  myShapes.add(isoTriangle, shapeName);
+	}
+      }else{
+      
+	if(shapeType == squareType){
+
+	  aSquare = new Square(left, upper, width);
+	  myShapes.add(aSquare, shapeName);
+	}else{
+
+	  equTriangle = new EquTriangle(left, upper, width);
+	  myShapes.add(equTriangle, shapeName);
+	}
+      }
+    }
+  }
+
+  return;
+}
+
+bool doQuit ()
+{
+  bool done;
+  bool eof;
+
+  done = readBool ("Are you sure you are done painting? (y/n) ", eof);
+  if (done || eof)
+    cout << "I've had fun painting with you! Bye..." << endl;
+  else
+    cout << "Back we go..." << endl;
+
+  return done;
+}
+
+void eof_message()
+{
+  cout << endl << "typing CTRL-d is not acceptable here"
+       << " - to terminate the program type CTRL-c" << endl;
+
+  return;
+}
+#ifndef SHAPE_H
+#define SHAPE_H
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+#include "Grid.h"
+#include "globals.h"
+
+//------------------------------------------------------------------------------
+
+class Shape
+{
+public:
+  Shape(int lft, int up, int rght, int low);
+
+  virtual ~Shape();
+  
+  void move(int new_left, int new_upper);
+
+  virtual void draw (Grid &grid) = 0;
+  
+protected:
+  void get_bounding_box(int &lft, int &up, int &rght, int &low) const;
+
+private:
+  int left;
+  int upper;
+  int right;
+  int lower;
+};
+
+#endif
+#include "Grid.h"
+#include "Shape.h"
+
+//------------------------------------------------------------------------------
+
+// SHAPE CLASS
+
+
+Shape :: Shape(int lft, int up, int rght, int low)
+{
+  left = lft;
+  upper = up;
+  right = rght;
+  lower = low;
+}
+
+Shape :: ~Shape()
+{
+}
+
+void Shape :: move(int new_left, int new_upper)
+{
+  int height = lower - upper;
+  int width = right - left;
+  
+  right = new_left + width;
+  lower = new_upper + height;
+  left = new_left;
+  upper = new_upper;
+  
+}
+
+void Shape :: get_bounding_box(int &lft, int &up, int &rght, int &low) const
+{
+  int base = right - left;
+  int height = lower - upper;
+
+  lft = left;
+  up = upper; 
+  rght = left + base;
+  low = upper + height;
+}
+#ifndef RECTANGLE_H
+#define RECTANGLE_H
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+#include "Shape.h"       // PARENT
+#include "Grid.h"        // GRID
+#include "globals.h"     // GLOBALS
+
+/********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        Rectangle.h
+ *
+ ********************************************************************/
+
+/**************************************************
+ *
+ * File name:          Rectangle.h
+ *
+ * Implmentation file: Rectangle.cpp
+ * 
+ * Class name:         Rectangle
+ *
+ * Parent class:       Shape
+ *
+ * Base class;         Shape
+ *
+ * Purpose:            creates a rectangle shape
+ *
+ ***************************************************/
+
+/****************************************************
+ *
+ * CLASS: Rectangle
+ *
+ * PURPOSE: Creates a Rectangle Shape
+ *
+ ****************************************************
+ *
+ * PUBLIC METHODS:
+ *
+ ****************************************************
+ *
+ * Rectanlge
+ *     PURPOSE: creates a Rectangle shape by using
+ *              the passed variables to set it's
+ *              boundries, ie upper left and lower right
+ *
+ * INPUT: lft - x coordinate of the shape
+ *        up - y coordinate of the shape
+ *        base - the base of the shape
+ *        height - height of the shape
+ *
+ *****************************************************
+ *
+ * move
+ *     PURPOSE: set new coordinates for an already
+ *              existing shape using passed coordinates.
+ *              ie moves the shape.
+ *
+ * INPUT: new_left - the new x coordinate of the shape
+ *        new_upper - the new y coordinate of the shape
+ *
+ * RETURN: NONE
+ *
+ *****************************************************
+ *
+ * draw
+ *     PURPOSE: draw's a shape on a passed by reference
+ *              grid
+ *
+ * INPUT: grid - a grid
+ *
+ * RETURN: NONE
+ *
+ ***************************************************/
+
+class Rectangle : public Shape
+{
+public:
+  Rectangle(int lft, int up, int width, int height);
+
+  //  void move (int new_left, int new_upper);
+  
+  void draw(Grid &grid);
+};
+
+#endif
+#include "Grid.h"
+#include "Shape.h"
+#include "Rectangle.h"
+
+//------------------------------------------------------------------------------
+
+// RECTANGLE CLASS
+
+/********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        Rectangle.cpp
+ *
+ ********************************************************************/
+
+/**************************************************************
+ *
+ * FUNCTION: Rectangle
+ *
+ * PURPOSE: Creates a rectangle using passed in arguments
+ * 
+ * INPUT: 
+ *      lft - coordinate of the left corner of the rectangle
+ *      up - coordinate of the upper corner of the rectangle
+ *      width - lenght of the width of the rectangle
+ *      height - lenght of the height of the rectangle
+ * 
+ ***************************************************************/
+
+Rectangle :: Rectangle (int lft, int up, int width, int height) :
+  Shape (lft, up , lft + width - 1, up + height - 1)
+{
+}
+
+
+/**************************************************************
+ *
+ * FUNCTION: Rectangle
+ *
+ * PURPOSE: draws the rectangle on a grid (passed in argument)
+ *          using a function from the class grid.
+ * 
+ * INPUT: 
+ *       grid - a grid
+ * 
+ ***************************************************************/
+
+void Rectangle :: draw (Grid &grid)
+{
+  int left;
+  int upper;
+  int right;
+  int lower;
+  
+  Shape :: get_bounding_box(left, upper, right, lower);
+  
+  grid.plot_line(left, upper, right, upper);
+  grid.plot_line(left, upper, left, lower);
+  grid.plot_line(left, lower, right, lower);
+  grid.plot_line(right, upper, right, lower);
+}
+#ifndef SQUARE_H
+#define SQUARE_H
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+#include "Rectangle.h"  // PARENT
+#include "Grid.h"       // GRID
+#include "globals.h"    // GLOBALS
+
+
+/********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        Square.h
+ *
+ ********************************************************************/
+
+/****************************************************
+ *
+ * File name:           Square.h
+ * 
+ * Implementation file: Square.cpp
+ *
+ * Class name:          Square
+ *
+ * Parent class:        Rectangle
+ *
+ * Base class:          Shape
+ *
+ * Purpose:             creates a square shape with
+ *                      help from parent class
+ *
+ ****************************************************/
+
+/****************************************************
+ *
+ * CLASS: Square
+ *
+ * PURPOSE: Creates a square shape
+ *
+ ****************************************************
+ *
+ * PUBLIC METHODS:
+ *
+ ****************************************************
+ *
+ * CLASS: Square
+ *     PURPOSE: creates a square shape by using
+ *              the passed variables to set it's
+ *              boundries, ie upper left and lower right
+ * INPUT: lft - x coordinate of the shape
+ *        up - y coordinate of the shape
+ *        width - the base of the shape
+ *
+ ***************************************************/
+
+
+class Square : public Rectangle
+{
+public:
+  Square(int lft, int up, int width);
+
+};
+
+#endif
+#include "Grid.h"       // grid
+#include "Rectangle.h"  // PARENT CLASS
+#include "Square.h"     // .h file
+
+//------------------------------------------------------------------------------
+
+// SQUARE CLASS
+
+/********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        Square.cpp
+ *
+ ********************************************************************/
+
+/**************************************************************
+ *
+ * Function: Square
+ * 
+ * PURPOSE: creates a square shape using passed in arguments
+ *
+ * INPUT: 
+ *      lft - coordinate of the left corner of the square
+ *      up - coordinate of the up corner of the square 
+ *      width - lenght of the width of the square
+ *
+ *
+ *************************************************************/
+
+Square :: Square (int lft, int up, int width)
+  : Rectangle (lft, up, width, width)
+{
+}
+#ifndef ISOTRIANGLE_H
+#define ISOTRIANGLE_H
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+#include "Shape.h"       // PARENT
+#include "Grid.h"        // GRID
+#include "globals.h"     // GLOBALS
+
+/********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        IsoTriangle.h
+ *
+ ********************************************************************/
+
+/****************************************************
+ *
+ * Class name:          IsoTriangle.h
+ *
+ * Implementation file: IsoTriangle.cpp
+ *
+ * Class name:          IsoTriangle
+ * 
+ * Parent class:        IsoTriangle.h
+ *
+ * Base class:          Shape.cpp
+ *
+ * Purpose:             creates an Isoceles Triangle
+ *                      shape with help from parent
+ *                      class
+ *
+ ****************************************************/
+
+/*****************************************************
+ *
+ * CLASS: IsoTriangle
+ *
+ * PURPOSE: Creates an Isosceles triangle shape
+ *
+ *****************************************************
+ *
+ * PUBLIC METHODS:
+ *
+ *****************************************************
+ *
+ * IsoTriangle
+ *     PURPOSE: creates an Isotraingle shape by using
+ *              the passed variable to set it's
+ *              boundries, ie upper left and lower right
+ *  
+ * INPUT: lft - x coordiantes for the shape
+ *        up - y coordinates for the shape
+ *        base - base of the shape
+ *        height - height of the shape
+ *
+ ******************************************************
+ *
+ * move
+ *     PURPOSE: set new coordinates for an already
+ *              existing shape using passed coordinates.
+ *              ie moves the shape.
+ *
+ * INPUT: new_left - the new x coordinate of the shape
+ *        new_upper - the new y coordinate of the shape
+ *
+ * RETURN: NONE
+ *
+ *****************************************************
+ *
+ * draw
+ *     PURPOSE: draw's a shape on a passed by reference
+ *              grid
+ *
+ * INPUT: grid - a grid
+ *
+ * RETURN: NONE
+ *
+ ****************************************************/
+
+
+class IsoTriangle : public Shape
+{
+public:
+  IsoTriangle(int lft, int up, int base, int height);
+
+  //  void move (int new_left, int new_upper);
+  
+  void draw(Grid &grid);
+};
+
+#endif
+#include "Grid.h"
+#include "Shape.h"
+#include "IsoTriangle.h"
+
+//------------------------------------------------------------------------------
+
+// RECTANGLE CLASS
+
+
+/********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        IsoTriangle.cpp
+ *
+ ********************************************************************/
+
+IsoTriangle :: IsoTriangle (int lft, int up, int base, int height) 
+  : Shape (lft, up, lft + base - 1, up + height - 1) 
+{
+}
+
+void IsoTriangle :: draw (Grid &grid)
+{
+  int left;
+  int upper;
+  int right;
+  int lower;
+  
+  Shape :: get_bounding_box(left, upper, right, lower);
+
+  int base = right - left + 1;
+
+  grid.plot_line(left + (base/2), upper, left, lower);
+  grid.plot_line(left + (base/2), upper, right, lower);
+  grid.plot_line(left, lower, right, lower);
+
+}
+#ifndef EQUTRIANGLE_H
+#define EQUTRIANGLE_H
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+#include "IsoTriangle.h"       // PARENT
+#include "Grid.h"              // GRID
+#include "globals.h"           // GLOBALS
+
+/********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        EquiTriangle.h
+ *
+ ********************************************************************/
+
+/***************************************************
+ *
+ * File name:           EquTriangle.h
+ *
+ * Implementation file: EquTriangle.cpp
+ *
+ * Class Name:          EquTriangle
+ *
+ * Parent class:        IsoTraingle
+ *
+ * Base class:          Shape
+ *
+ * Purpose:             creates an equilateral triangle 
+ *                      shape with help from parent
+ *                      class
+ *
+ **************************************************/
+
+/****************************************************
+ * 
+ * CLASS: EquTriangle
+ *
+ * PURPOSE: Creates an Equitriangle shape
+ * 
+ ****************************************************
+ *
+ * PUBLIC METHODS:
+ *
+ ****************************************************
+ *
+ * CLASS: EquTriangle
+ *     PURPOSE: creates an Equitrinagle shape by using
+ *              the passed variables to set it's 
+ *              boundries, ie upper left and lower right
+ * INPUT: lft - x coordinate of the shape
+ *        up - y coordinate of the shape
+ *        base - the base of the shape
+ *
+ ***************************************************/
+
+
+class EquTriangle : public IsoTriangle
+{
+public:
+  EquTriangle(int lft, int up, int base);
+
+};
+
+#endif
+#include "Grid.h"
+#include "IsoTriangle.h"
+#include "EquTriangle.h"
+
+//------------------------------------------------------------------------------
+
+/********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        EquiTriangle.cpp
+ *
+ ********************************************************************/
+
+// RECTANGLE CLASS
+
+EquTriangle :: EquTriangle (int lft, int up, int base)
+  : IsoTriangle (lft, up, base, base)
+{
+}
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p3> make
+g++ main.cpp Grid.cpp Grid.h Shape.cpp Shape.h Shape_Collection.cpp Shape_Collection.h Rectangle.cpp Rectangle.h Square.cpp Square.h IsoTriangle.cpp IsoTriangle.h EquTriangle.cpp EquTriangle.h ioutil.cpp ioutil.h -ansi -pedantic-errors -Wall -Wconversion -g -o paint
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p3> paint
+
+[]
+
+--------------------------------------------------------------------------------
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: a
+Please enter shape name (no blanks): box
+Options:  r(ectanle) shape
+          s(square) shape
+          i(soceles traingle) shape
+          e(quilateral triangle) shape
+
+Choice: s
+Enter x coordinate for upper left corner of bounding box: 0
+Enter y coordinate for upper left corner of bounding box: 0
+Enter width: 3
+
+[box]
+
+--------------------------------------------------------------------------------
+***                                                                             
+* *                                                                             
+***                                                                             
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: mov  
+Please enter shape name (no blanks): box
+Enter x coordinate for upper left corner of bounding box: -1
+Enter y coordinate for upper left corner of bounding box: -1
+
+[box]
+
+--------------------------------------------------------------------------------
+ *                                                                              
+**                                                                              
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: m
+Please enter shape name (no blanks): box
+Enter x coordinate for upper left corner of bounding box: 80
+Enter y coordinate for upper left corner of bounding box: 22
+
+[box]
+
+--------------------------------------------------------------------------------
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: a
+Please enter shape name (no blanks): border
+Options:  r(ectanle) shape
+          s(square) shape
+          i(soceles traingle) shape
+          e(quilateral triangle) shape
+
+Choice: r
+Enter x coordinate for upper left corner of bounding box: 0
+Enter y coordinate for upper left corner of bounding box: 0
+Enter width: 80
+Enter height: 22
+
+[border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: a
+Please enter shape name (no blanks): thin
+Options:  r(ectanle) shape
+          s(square) shape
+          i(soceles traingle) shape
+          e(quilateral triangle) shape
+
+Choice: r
+Enter x coordinate for upper left corner of bounding box: 12
+Enter y coordinate for upper left corner of bounding box: 5
+Enter width: 1
+Enter height: 4
+
+[thin,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*           *                                                                  *
+*           *                                                                  *
+*           *                                                                  *
+*           *                                                                  *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: a
+Please enter shape name (no blanks): isotri
+Options:  r(ectanle) shape
+          s(square) shape
+          i(soceles traingle) shape
+          e(quilateral triangle) shape
+
+Choice: i
+Enter x coordinate for upper left corner of bounding box: 2
+Enter y coordinate for upper left corner of bounding box: 2
+Enter width: 7
+Enter height: 18
+
+[isotri,thin,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *     *                                                                  *
+*   * *     *                                                                  *
+*   * *     *                                                                  *
+*   * *     *                                                                  *
+*   * *                                                                        *
+*   * *                                                                        *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+* *     *                                                                      *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: a
+Please enter shape name (no blanks): equtri
+Options:  r(ectanle) shape
+          s(square) shape
+          i(soceles traingle) shape
+          e(quilateral triangle) shape
+
+Choice: e
+Enter x coordinate for upper left corner of bounding box: 35
+Enter y coordinate for upper left corner of bounding box: 8
+Enter width: 8
+
+[equtri,isotri,thin,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *     *                                                                  *
+*   * *     *                                                                  *
+*   * *     *                                                                  *
+*   * *     *                          *                                       *
+*   * *                               **                                       *
+*   * *                               * *                                      *
+*  *   *                             *  *                                      *
+*  *   *                             *   *                                     *
+*  *   *                            *    *                                     *
+*  *   *                            *     *                                    *
+*  *   *                           ********                                    *
+*  *   *                                                                       *
+* *     *                                                                      *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: m
+Please enter shape name (no blanks): equtri
+Enter x coordinate for upper left corner of bounding box: 14
+Enter y coordinate for upper left corner of bounding box: 5
+
+[equtri,isotri,thin,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *     *     *                                                            *
+*   * *     *    **                                                            *
+*   * *     *    * *                                                           *
+*   * *     *   *  *                                                           *
+*   * *         *   *                                                          *
+*   * *        *    *                                                          *
+*  *   *       *     *                                                         *
+*  *   *      ********                                                         *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+* *     *                                                                      *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: d
+Please enter shape name (no blanks): thin
+
+[equtri,isotri,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *           *                                                            *
+*   * *          **                                                            *
+*   * *          * *                                                           *
+*   * *         *  *                                                           *
+*   * *         *   *                                                          *
+*   * *        *    *                                                          *
+*  *   *       *     *                                                         *
+*  *   *      ********                                                         *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+* *     *                                                                      *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: d
+Please enter shape name (no blanks): thin
+
+ERROR - Shape name doesn't exist in shape collection
+
+[equtri,isotri,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *           *                                                            *
+*   * *          **                                                            *
+*   * *          * *                                                           *
+*   * *         *  *                                                           *
+*   * *         *   *                                                          *
+*   * *        *    *                                                          *
+*  *   *       *     *                                                         *
+*  *   *      ********                                                         *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+* *     *                                                                      *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: d
+Please enter shape name (no blanks): foo
+
+ERROR - Shape name doesn't exist in shape collection
+
+[equtri,isotri,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *           *                                                            *
+*   * *          **                                                            *
+*   * *          * *                                                           *
+*   * *         *  *                                                           *
+*   * *         *   *                                                          *
+*   * *        *    *                                                          *
+*  *   *       *     *                                                         *
+*  *   *      ********                                                         *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+* *     *                                                                      *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: a
+Please enter shape name (no blanks): box
+
+ERROR - Shape name already exist in shape collection
+
+
+[equtri,isotri,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *           *                                                            *
+*   * *          **                                                            *
+*   * *          * *                                                           *
+*   * *         *  *                                                           *
+*   * *         *   *                                                          *
+*   * *        *    *                                                          *
+*  *   *       *     *                                                         *
+*  *   *      ********                                                         *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+*  *   *                                                                       *
+* *     *                                                                      *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: a
+Please enter shape name (no blanks): screwy
+Options:  r(ectanle) shape
+          s(square) shape
+          i(soceles traingle) shape
+          e(quilateral triangle) shape
+
+Choice: i
+Enter x coordinate for upper left corner of bounding box: 40
+Enter y coordinate for upper left corner of bounding box: 5
+Enter width: 3
+Enter height: -2
+ERROR - Height most be greater than 0
+Enter height: 10
+
+[screwy,equtri,isotri,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *           *                      *                                     *
+*   * *          **                      *                                     *
+*   * *          * *                     *                                     *
+*   * *         *  *                     *                                     *
+*   * *         *   *                    *                                     *
+*   * *        *    *                   * *                                    *
+*  *   *       *     *                  * *                                    *
+*  *   *      ********                  * *                                    *
+*  *   *                                * *                                    *
+*  *   *                                ***                                    *
+*  *   *                                                                       *
+*  *   *                                                                       *
+* *     *                                                                      *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: a
+Please enter shape name (no blanks): nogood
+Options:  r(ectanle) shape
+          s(square) shape
+          i(soceles traingle) shape
+          e(quilateral triangle) shape
+
+Choice: r
+Enter x coordinate for upper left corner of bounding box: 70
+Enter y coordinate for upper left corner of bounding box: 15
+Enter width: 0
+ERROR - Width most be greater than 0
+Enter width: 5
+Enter height: 3
+
+[nogood,screwy,equtri,isotri,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *           *                      *                                     *
+*   * *          **                      *                                     *
+*   * *          * *                     *                                     *
+*   * *         *  *                     *                                     *
+*   * *         *   *                    *                                     *
+*   * *        *    *                   * *                                    *
+*  *   *       *     *                  * *                                    *
+*  *   *      ********                  * *                                    *
+*  *   *                                * *                                    *
+*  *   *                                ***                                    *
+*  *   *                                                              *****    *
+*  *   *                                                              *   *    *
+* *     *                                                             *****    *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: xxx
+INVALID - input string longer than allowed -- please try again.
+Please enter choice: a
+Please enter shape name (no blanks): diamond
+Options:  r(ectanle) shape
+          s(square) shape
+          i(soceles traingle) shape
+          e(quilateral triangle) shape
+
+Choice: d
+
+ERROR - Invalid shape type - (r,s,i,e)
+
+
+[nogood,screwy,equtri,isotri,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *           *                      *                                     *
+*   * *          **                      *                                     *
+*   * *          * *                     *                                     *
+*   * *         *  *                     *                                     *
+*   * *         *   *                    *                                     *
+*   * *        *    *                   * *                                    *
+*  *   *       *     *                  * *                                    *
+*  *   *      ********                  * *                                    *
+*  *   *                                * *                                    *
+*  *   *                                ***                                    *
+*  *   *                                                              *****    *
+*  *   *                                                              *   *    *
+* *     *                                                             *****    *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: pop push        a
+Please enter shape name (no blanks): pop push
+Options:  r(ectanle) shape
+          s(square) shape
+          i(soceles traingle) shape
+          e(quilateral triangle) shape
+
+Choice: r
+Enter x coordinate for upper left corner of bounding box: 60
+Enter y coordinate for upper left corner of bounding box: 5
+Enter width: 5
+Enter height: 5
+
+[pop,nogood,screwy,equtri,isotri,border,box]
+
+--------------------------------------------------------------------------------
+********************************************************************************
+*                                                                              *
+*    *                                                                         *
+*    *                                                                         *
+*    *                                                                         *
+*   * *           *                      *                  *****              *
+*   * *          **                      *                  *   *              *
+*   * *          * *                     *                  *   *              *
+*   * *         *  *                     *                  *   *              *
+*   * *         *   *                    *                  *****              *
+*   * *        *    *                   * *                                    *
+*  *   *       *     *                  * *                                    *
+*  *   *      ********                  * *                                    *
+*  *   *                                * *                                    *
+*  *   *                                ***                                    *
+*  *   *                                                              *****    *
+*  *   *                                                              *   *    *
+* *     *                                                             *****    *
+* *     *                                                                      *
+* *******                                                                      *
+*                                                                              *
+********************************************************************************
+--------------------------------------------------------------------------------
+Options:  a(dd shape)
+          d(elete) shape
+          m(ove) shape
+          q(uit) paint program
+Please enter choice: q
+Are you sure you are done painting? (y/n) y
+I've had fun painting with you! Bye...
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p3> exit
+exit
+
+Script done on 2022-04-08 22:49:02-06:00

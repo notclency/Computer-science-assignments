@@ -1,0 +1,137 @@
+        -:    0:Source:Grid.cpp
+        -:    0:Graph:Grid.gcno
+        -:    0:Data:Grid.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include <cstdlib>
+        -:    2:#include "Grid.h"
+        -:    3:
+       11:    4:Grid :: Grid ( )
+        -:    5:{
+        -:    6:  int i, j;
+        -:    7:
+        -:    8:
+      176:    9:  for (j = 0; j < YMAX; j++)
+        -:   10:    {
+     8415:   11:      for (i = 0; i < XMAX; i++)
+        -:   12:	{
+     8250:   13:	  raster[j][i] = ' ';
+        -:   14:	}
+      165:   15:      raster[j][XMAX] = EOLN;
+      165:   16:      raster[j][XMAX+1] = EOSTR;
+        -:   17:    } 
+       11:   18:  return;
+        -:   19:}
+        -:   20:
+      193:   21:void Grid :: plot_point (int x, int y)
+        -:   22:{
+      193:   23:  if (is_in_bounds (x, y))
+      157:   24:    raster[y][x] = '*';
+      193:   25:  return;
+        -:   26:}
+        -:   27:
+       11:   28:void Grid :: plot_line (int x1, int y1, int x2, int y2)
+        -:   29:{
+        -:   30:  int deltax, deltay;                         // required run for line
+        -:   31:  int x, y;                                   // coordinates of a point
+        -:   32:  int xinc1, xinc2;                           // x increments per pixel
+        -:   33:  int yinc1, yinc2;                           // y increments per pixel
+        -:   34:  int numerator, denominator;                 // ratio of per pixel changes
+        -:   35:  int numeratorincrement;                     // numerator increment per pixel
+        -:   36:  int numPixels;                              // largest run
+        -:   37:
+        -:   38:  int pixCount;                               // loop control variables
+       11:   39:  deltax = abs(x2 - x1);
+       11:   40:  deltay = abs(y2 - y1);
+        -:   41:
+        -:   42:
+       11:   43:  if (x2 >= x1)
+        -:   44:    {
+       10:   45:      xinc1 = 1;
+       10:   46:      xinc2 = 1;
+        -:   47:    }
+        -:   48:  else
+        -:   49:    {
+        1:   50:      xinc1 = -1;
+        1:   51:      xinc2 = -1;
+        -:   52:    }
+       11:   53:  if (y2 >= y1)
+        -:   54:    {
+        9:   55:      yinc1 = 1;
+        9:   56:      yinc2 = 1;
+        -:   57:    }
+        -:   58:  else
+        -:   59:    {
+        2:   60:      yinc1 = -1;
+        2:   61:      yinc2 = -1;
+        -:   62:    }
+       11:   63:  if (deltax >= deltay)
+        -:   64:    {
+       10:   65:      xinc1 = 0;
+       10:   66:      yinc2 = 0;
+       10:   67:      denominator = deltax;
+       10:   68:      numerator = deltax / 2;
+       10:   69:      numeratorincrement = deltay;
+       10:   70:      numPixels = deltax;
+        -:   71:    }
+        -:   72:  else
+        -:   73:    {
+        1:   74:      xinc2 = 0;
+        1:   75:      yinc1 = 0;
+        1:   76:      denominator = deltay;
+        1:   77:      numerator = deltay / 2;
+        1:   78:      numeratorincrement = deltax;
+        1:   79:      numPixels = deltay;
+        -:   80:    }
+       11:   81:  x = x1;
+       11:   82:  y = y1;
+        -:   83:
+      196:   84:  for (pixCount = 0; pixCount <= numPixels; pixCount++)
+        -:   85:    {
+      185:   86:      plot_point(x, y);
+      185:   87:      numerator += numeratorincrement;
+      185:   88:      if (numerator >= denominator)
+        -:   89:	{
+       28:   90:	  numerator -= denominator;
+       28:   91:	  x += xinc1;
+       28:   92:	  y += yinc1;
+        -:   93:	}
+      185:   94:      x += xinc2;
+      185:   95:      y += yinc2;
+        -:   96:    }
+        -:   97:
+       11:   98:  return;
+        -:   99:}
+        -:  100:
+        -:  101:
+       15:  102:void Grid :: write (ostream& out) const
+        -:  103:{
+        -:  104:  int i;
+        -:  105:
+      765:  106:  for (i = 0; i < XMAX; i++)
+      750:  107:    out << '-';
+       15:  108:  out << endl;
+      240:  109:  for (i = 0; i < YMAX; i++)
+        -:  110:    {
+      225:  111:      out << raster[i];
+        -:  112:    }
+      765:  113:  for (i = 0; i < XMAX; i++)
+      750:  114:    out << '-';
+       15:  115:  out << endl;
+        -:  116:
+       15:  117:  return;
+        -:  118:}
+        -:  119:
+        -:  120:
+        1:  121:ostream& operator << (ostream& out, const Grid& g)
+        -:  122:{
+        1:  123:  g.write(out);
+        -:  124:   
+        1:  125:  return out;
+        -:  126:}
+        -:  127:
+        -:  128:
+      193:  129:bool Grid :: is_in_bounds (int x, int y) const
+        -:  130:{
+      193:  131:  return ((0 <= x && x < XMAX) && (0 <= y && y < YMAX));
+        -:  132:}

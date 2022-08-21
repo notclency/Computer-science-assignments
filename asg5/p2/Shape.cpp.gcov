@@ -1,0 +1,103 @@
+        -:    0:Source:Shape.cpp
+        -:    0:Graph:Shape.gcno
+        -:    0:Data:Shape.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "Shape.h"
+        -:    2:#include "Grid.h"
+        -:    3:#include "globals.h"
+        -:    4:
+        -:    5:// IMPLEMTATONS OF THE "SHAPE.H" FILE.
+        -:    6:
+        -:    7:/**************************************************************************
+        -:    8: *
+        -:    9: * Name:                 Clency Tabe
+        -:   10: * Email:                ctabe297@mtroyal.ca
+        -:   11: * Course:               COMP 16333, 001
+        -:   12: * Due Date:             April 8, 2022
+        -:   13: * Instructor Name:      Paul Pospisil
+        -:   14: * File name:            Shape.cpp
+        -:   15: *
+        -:   16: **************************************************************************/
+        -:   17:
+        -:   18:/**************************************************************************
+        -:   19: *
+        -:   20: * Function:    Shape
+        -:   21: * Purpose:     Set the coordinates of the bounding box of a shape using
+        -:   22: *              provided passed in arguments
+        -:   23: * Input:       x and ycoordiantes for upper left corner of bounding box, and
+        -:   24: *              width of the shape box.
+        -:   25: * Output:      None
+        -:   26: * Return:      None
+        -:   27: *
+        -:   28: **************************************************************************/
+       12:   29:Shape :: Shape(int lft, int up, int width)
+        -:   30:{
+       12:   31:  left = lft;
+       12:   32:  upper = up;
+       12:   33:  right = left + width - 1;
+       12:   34:  lower = upper + width - 1;
+       12:   35:}
+        -:   36:
+        -:   37:
+        -:   38:/**************************************************************************
+        -:   39: * 
+        -:   40: * Function:   move
+        -:   41: * Purpose:    Moves a shape by setting the new coordinates of the bounding
+        -:   42: *             box using the passed-in new x and y coordiantes for upper left
+        -:   43: *             corner of bounding box of an existing shape
+        -:   44: * Input:      new x and y coordiantes for upper left corner of bounding box
+        -:   45: * Output:     None
+        -:   46: * Return:     None
+        -:   47: *
+        -:   48: **************************************************************************/
+        6:   49:void Shape :: move(int new_left, int new_upper)
+        -:   50:{
+        -:   51:  int new_right;
+        -:   52:  int new_lower;
+        -:   53:  
+        6:   54:  get_bounding_box(new_left, new_upper, new_right, new_lower);
+        -:   55:
+        6:   56:  left = new_left;
+        6:   57:  upper = new_upper;
+        6:   58:  right = new_right;
+        6:   59:  lower = new_lower;
+        6:   60:}
+        -:   61:
+        -:   62:
+        -:   63:/**************************************************************************
+        -:   64: * 
+        -:   65: * Function:   draw
+        -:   66: * Purpose:    Draws an exsiting shape on a Grid using a function from the
+        -:   67: *             grid class
+        -:   68: * Input:      grid
+        -:   69: * Output:     None
+        -:   70: * Return:     None
+        -:   71: *
+        -:   72: **************************************************************************/
+       20:   73:void Shape :: draw (Grid &grid)
+        -:   74:{
+       20:   75:  grid.plot_line(left, upper, right, upper);
+       20:   76:  grid.plot_line(left, upper, left, lower);
+       20:   77:  grid.plot_line(right, upper, right, lower);
+       20:   78:  grid.plot_line(left, lower, right, lower);
+       20:   79:}
+        -:   80:
+        -:   81:/**************************************************************************
+        -:   82: * 
+        -:   83: * Function:   get_bounding_box
+        -:   84: * Purpose:    Gets the coordinates of the bounding box i.e the x and 
+        -:   85: *             y coordiantes for upper left corner, the x and y coordiantes
+        -:   86: *             for lower right corner of the bounding box
+        -:   87: * Input:      4 interger values to be set to the required coordiantes
+        -:   88: * Output:     all interger values to be returned as the required coordinates
+        -:   89: * Return:     None
+        -:   90: *
+        -:   91: **************************************************************************/
+        6:   92:void Shape :: get_bounding_box(int &lft, int &up, int &rght, int &low) const
+        -:   93:{
+        6:   94:  int width = right - left;
+        -:   95:
+        6:   96:  rght = lft + width;
+        6:   97:  low = up + width;
+        6:   98:}

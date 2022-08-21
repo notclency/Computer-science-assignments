@@ -1,0 +1,649 @@
+Script started on 2022-03-22 00:02:57-06:00
+[ctabe297@ins.mtroyal.ca ~/assignments/a4p2> ls -al
+total 68
+drwxr-xr-x 2 ctabe297 students.pg   156 Mar 22 00:02 .
+drwxr-xr-x 8 ctabe297 students.pg   101 Mar 21 21:00 ..
+-rw-r--r-- 1 ctabe297 students.pg 24560 Mar 21 21:03 a4p2.cpp
+-rw-r--r-- 1 ctabe297 students.pg 10161 Mar 21 23:58 HockeyList.cpp
+-rw-r--r-- 1 ctabe297 students.pg  6078 Mar 21 21:07 HockeyList.h
+-rw-r--r-- 1 ctabe297 students.pg  5759 Mar 17 17:26 ioutil.cpp
+-rw-r--r-- 1 ctabe297 students.pg  4254 Mar 17 17:26 ioutil.h
+-rw-r--r-- 1 ctabe297 students.pg   331 Mar 21 20:59 makefile
+-rw-r--r-- 1 ctabe297 students.pg   332 Mar 21 21:05 team_rosters.txt
+-rw-r--r-- 1 ctabe297 students.pg     0 Mar 22 00:02 typescript
+[ctabe297@ins.mtroyal.ca ~/assignments/a4p2> cat HockeyList.cpp HockeyList.h makefile 
+#include "HockeyList.h"
+
+/********************************************************************************************************
+
+              Olympic Hockey Teams Class Functions
+
+
+  Author:            Clency Tabe
+  Email address:     ctabe297@mtroyal.ca
+  Course:            COMP 1633 - 001
+  Assignment:        Assignment 4 part 2
+  Due Date:          March 21, 2022
+  Instructor:        Paul Pospisil
+ 
+  Filename:          HockeyList.cpp
+
+  ***********************************************************
+
+  Purpose:
+  
+  This application uses declared variables and a declared class
+  from an .h file named "HockeyList.h". The code present in this file
+  is the implementation of the functions of the declared class in the
+  .h file, both private and public functions.
+
+  
+  The private data members functions are:
+  
+  findTeamNumber:   Which finds the numbers of a given team.
+  search:           which searches for a given player.
+  createNode:       which creates a player node to be linked to the team list.
+  link:             which links a newly created player node or unlinked player
+                    node to the end of a specific teams list.
+  unlink:           which unlinks a node from the team roster.
+  displayTeam:      which displays all members of a specific team;
+
+  head[NUMTEAMS]:   each element in this array is a ListNode which acts as a head for each team 
+                    present on the team roster.
+
+  tail[NUMTEAMS]:   each element in this array is a ListNode which acts as a tail for each team 
+                    present on the team roster.
+
+  
+  Function descriptions:
+
+  findTeamNumber:   this function receives a letter that corresponds to
+                    a teamas a passed argument. It then converts that letter
+                    into an interger corresponding to it's team and returns it
+
+  search:           this functions receives a position of a given player,
+                    an undefiend ListNode pointer, an undefined integer team and
+                    found bool variable, then searches for the player. If the player
+                    is found, the varibale found will be se to true and the function
+                    will return the item node pointing to the player and the team variable
+                    containing the players team else, the found boolean will be set to false
+                    and ListNode pointer, and item will be left undefined.
+                   
+  createNode:       this functions recieves a players info, creates and returns a playerNode
+                    containing the player's info.
+  
+  link:             this function receives a node pointer and team number and unlinks the
+                    item pointer to the team of a specific teams list. It does this by seting
+                    the previous node from  the tail to point to this item, the item's previous
+                    pointer to point to the previous node from the tail, the item's next pointer
+                    to point to the address of the tail and fianlly the tail to point to the item.
+                    IN THAT SPECIFIC ORDER!. 
+  
+ unlink:            this function unlinks a node from the teams list. It does this by seting the next pointer
+                    of the previous item to next to the next node to item, and the previous pointer of the next
+                    node to item to the previous node to the item.
+
+ displayTeam:       this function receives an integer corresponding to team, a position variable
+                    to keep track of the members of the team roster, and an ostream, then displays
+                    all the members a of that team together with each of their info using the ostream.
+
+
+
+******************************************************************************************************/
+
+HockeyList :: HockeyList (){
+
+  for(int i = 0; i < NUMTEAMS; i++){
+    head[i].next = &tail[i];
+    tail[i].prev = &head[i];
+  }  
+}
+
+
+
+HockeyList :: ~HockeyList (){
+
+  ListPtr curr;
+  
+  for(int i = 0; i < NUMTEAMS; i++){
+    if(head[i].next != &tail[i]){
+      curr = head[i].next;
+      while(curr != &tail[i]){
+     	delete curr->thePlayer;
+	curr = curr->next;
+	delete curr->prev;
+      }
+    }
+  }
+}
+
+int HockeyList :: load (istream &infile){
+
+  char name[MAXNAMELEN+1];
+  char team;
+  char position;
+  int goals;
+  int assists;
+  int goalsAgainst;
+  char junk;
+  int count = 0;
+  int toTeam;
+  
+  ListPtr newPlayer;
+
+  infile >> team;
+  while(!infile.eof()){
+    count ++;
+
+    infile >> position >> goals >> assists >> goalsAgainst;
+    infile.get(junk);
+    infile.getline(name, MAXNAMELEN+1, '\n');
+    newPlayer = createNode(name, position, goals, assists, goalsAgainst);
+    toTeam = findTeamNumber(team);
+    link(newPlayer, toTeam);
+    
+    infile >> team;
+  }
+  
+  return count;
+}
+
+void HockeyList :: write (ostream &out) const{
+
+  ListPtr curr;
+  
+  for(int i = 0; i < NUMTEAMS; i++){
+    if(head[i].next != &tail[i]){
+      curr = head[i].next;
+      while(curr != &tail[i]){
+
+	out << TEAMCHARS[i] << " "
+	    << curr->thePlayer->position << " "
+	    << curr->thePlayer->goals <<  " "
+	    << curr->thePlayer->assists << " "
+	    << curr->thePlayer->goalsAgainst << " "
+	    << curr->thePlayer->name << '\n';
+	
+	curr = curr->next;
+      }
+    }
+  }
+}
+
+void HockeyList :: display (ostream &out) const{
+
+  ListPtr item;
+  int position = 0;
+  bool found;
+  int team;
+  
+  search(1, item, team, found); 
+  if(!found){    
+    out << "*******************************************************" << endl
+	<< endl
+	<< "Empty  -- no players on the List" << endl
+	<< endl
+	<< "*******************************************************" << endl;
+  }else{
+    for(int teamCounter = 0; teamCounter < NUMTEAMS; teamCounter++){
+      displayTeam(teamCounter, position, out);
+    }
+  }
+}
+
+
+bool HockeyList :: move (int position){
+
+  ListPtr item;
+  int playersTeam;
+  bool found;
+  bool moved = false;
+  
+  search(1, item, playersTeam, found);
+  if(found){
+    search(position, item, playersTeam, found);
+    if(found){
+      if(playersTeam != INJURY_LIST_POSITION){
+	unlink(item);
+	link(item, INJURY_LIST_POSITION);
+	moved = true;
+      }
+    }
+  }
+
+  return moved;
+}
+
+bool HockeyList :: activate (int position, char team){
+
+  ListPtr item;
+  int newTeam;
+  int playersTeam;
+  bool found;
+  bool activated = false;
+  
+  search(1, item, playersTeam, found);
+  if(found){
+    search(position, item, playersTeam, found);
+    if(found){
+      if(playersTeam == INJURY_LIST_POSITION){ 
+	newTeam = findTeamNumber(team);
+	unlink(item);
+	link(item, newTeam);
+	activated = true;
+      }
+    }
+  }
+
+  return activated;
+}
+
+bool HockeyList :: update (int position, int goals, int assists, int goalsAgainst){
+
+  ListPtr player;
+  int playersTeam;
+  bool found;
+  bool updated = false;
+
+ 
+  search(1, player, playersTeam, found);
+  if(found){
+    search(position, player, playersTeam, found);
+    if(found){
+      if(playersTeam != INJURY_LIST_POSITION){
+	player->thePlayer->goals += goals;
+	player->thePlayer->assists += assists;
+	if(player->thePlayer->position == GOAL){
+	  player->thePlayer->goalsAgainst += goalsAgainst;
+	}
+	unlink(player);
+	link(player, playersTeam); 
+	updated = true;
+      }
+    }
+  }
+  
+
+  return updated;
+}
+
+void HockeyList :: lookup (int position, PlayerNode &player, bool &found) const{
+
+  ListPtr item;
+  int team;
+  
+  search(position, item, team, found);
+  if(found){
+    player = *(item->thePlayer);
+  }
+}
+
+char HockeyList :: getTeam (int position) const{
+
+  ListPtr item;
+  int playersTeam;
+  char team;
+  bool found;
+  
+  search(position, item, playersTeam, found);
+  if(found){
+    if(playersTeam == 0){
+      team = TEAMCHARS[0];
+    }else if(playersTeam == 1){
+      team = TEAMCHARS[1];
+    }else if(playersTeam == 2){
+      team = TEAMCHARS[2];
+    }else if(playersTeam == 3){
+      team = TEAMCHARS[3];
+    }
+  }
+
+  return team;
+}
+
+
+
+// PRIVATE FUNCTIONS
+
+
+int HockeyList :: findTeamNumber (char teamLetter){
+
+  int team;
+  
+  if(teamLetter == TEAMCHARS[0]){
+    team = 0;
+  }else if(teamLetter == TEAMCHARS[1]){
+    team = 1;
+  }else if(teamLetter == TEAMCHARS[2]){
+    team = 2;
+  }else if(teamLetter== TEAMCHARS[3]){
+    team = 3;
+  }
+  
+  return team;
+}
+
+void HockeyList :: search (int pos, ListPtr &item, int &team, bool &found) const{
+
+  ListPtr node;
+  int searchIndex = 1;
+  found = false;
+
+  if(pos >= 1){
+    for(int i = 0; i < NUMTEAMS; i++){
+      node = head[i].next;
+      while(node != &tail[i] && !found){
+	if(searchIndex == pos){
+	  found = true;
+	  item = node;
+	  team = i;
+	}else{
+	  node = node->next;
+	  searchIndex ++;
+	}
+      }
+    }
+  }
+}
+
+HockeyList :: ListPtr HockeyList :: createNode (const char name[], char position, int goals, int assists, int goalsAgainst) const{
+  
+  ListPtr newNode = new ListNode;
+  newNode->thePlayer = new PlayerNode;
+
+  for(int i=0; i<MAXNAMELEN; i++){
+    newNode->thePlayer->name[i] = name[i];
+  }
+  newNode->thePlayer->position = position;
+  newNode->thePlayer->goals = goals;
+  newNode->thePlayer->assists = assists;
+  newNode->thePlayer->goalsAgainst = goalsAgainst;
+
+  return newNode;
+}
+
+void HockeyList :: link(ListPtr item, int team){
+
+  tail[team].prev->next = item;
+  item->prev = tail[team].prev;
+  item->next = &tail[team];
+  tail[team].prev = item;
+  
+}
+
+void HockeyList :: unlink (ListPtr item){
+
+  item->prev->next = item->next;
+  item->next->prev = item->prev;
+  item->next = NULL;
+  item->prev = NULL;
+}
+
+void HockeyList :: displayTeam (int team, int &position, ostream &out) const{
+
+  ListPtr curr;
+  
+  if(head[team].next != &tail[team]){
+    
+    curr = head[team].next; 
+
+    out << endl
+	<< endl
+	<< TEAMS[team]
+	<< endl
+	<< endl;
+
+    while(curr != &tail[team]){
+
+      position ++;
+
+      out << position << left << setw(5)  << ":"
+	  << setw(NAMEWIDTH) << curr->thePlayer->name
+	  << right << setw(GOALWIDTH)
+	  << curr->thePlayer->goals << " goals"
+	  << setw(ASSISTWIDTH) << curr->thePlayer->assists << " assists";
+      
+      if(curr->thePlayer->position == GOAL){
+	out << setw(ASSISTWIDTH) << curr->thePlayer->goalsAgainst
+	    << " goals against"
+	    << endl;
+      }else{
+	out << endl;
+      }
+    
+      curr = curr->next;
+    }
+  }
+}
+#ifndef HOCKEYLIST_H
+#define HOCKEYLIST_H
+
+/********************************************************************************************************
+
+              Olympic Hockey Teams Class Functions
+
+
+  Author:            Clency Tabe
+  Email address:     ctabe297@mtroyal.ca
+  Course:            COMP 1633 - 001
+  Assignment:        Assignment 4 part 2
+  Due Date:          March 21, 2022
+  Instructor:        Paul Pospisil
+ 
+  Filename:          HockeyList.h
+
+  ***********************************************************
+
+  Purpose:
+  
+  This application uses declared variables and a declared class
+  from an .h file named "HockeyList.h". The code present in this file
+  is the implementation of the functions of the declared class in the
+  .h file, both private and public functions.
+
+  
+  The private data members functions are:
+  
+  findTeamNumber:   Which finds the numbers of a given team.
+  search:           which searches for a given player.
+  createNode:       which creates a player node to be linked to the team list.
+  link:             which links a newly created player node or unlinked player
+                    node to the end of a specific teams list.
+  unlink:           which unlinks a node from the team roster.
+  displayTeam:      which displays all members of a specific team;
+
+  head[NUMTEAMS]:   each element in this array is a ListNode which acts as a head for each team 
+                    present on the team roster.
+
+  tail[NUMTEAMS]:   each element in this array is a ListNode which acts as a tail for each team 
+                    present on the team roster.
+
+
+
+  Function descriptions:
+
+  findTeamNumber:   this function receives a letter that corresponds to
+                    a teamas a passed argument. It then converts that letter
+                    into an interger corresponding to it's team and returns it
+
+  search:           this functions receives a position of a given player,
+                    an undefiend ListNode pointer, an undefined integer team and
+                    found bool variable, then searches for the player. If the player
+                    is found, the varibale found will be se to true and the function
+                    will return the item node pointing to the player and the team variable
+                    containing the players team else, the found boolean will be set to false
+                    and ListNode pointer, and item will be left undefined.
+                   
+  createNode:       this functions recieves a players info, creates and returns a playerNode
+                    containing the player's info.
+  
+  link:             this function receives a node pointer and team number and unlinks the
+                    item pointer to the team of a specific teams list. It does this by seting
+                    the previous node from  the tail to point to this item, the item's previous
+                    pointer to point to the previous node from the tail, the item's next pointer
+                    to point to the address of the tail and fianlly the tail to point to the item.
+                    IN THAT SPECIFIC ORDER!. 
+  
+ unlink:            this function unlinks a node from the teams list. It does this by seting the next pointer
+                    of the previous item to next to the next node to item, and the previous pointer of the next
+                    node to item to the previous node to the item.
+
+ displayTeam:       this function receives an integer corresponding to team, a position variable
+                    to keep track of the members of the team roster, and an ostream, then displays
+                    all the members a of that team together with each of their info using the ostream.
+
+
+
+******************************************************************************************************/
+
+
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+using namespace std;
+
+const int MAXNAMELEN = 25;
+const int MINNAMELEN = 1;
+
+const int NUMTEAMS = 4;
+const int INJURY_LIST_POSITION = NUMTEAMS-1;
+
+typedef char teamname[MAXNAMELEN+1];		// one team name is a c-string
+
+const teamname TEAMS[NUMTEAMS] = {"Team Canada:",		
+                                  "Team Finland:", 
+                                  "Team USA:",
+                                  "Injury Reserve:" };
+
+const char TEAMCHARS[NUMTEAMS] = {'C', 'F', 'U', 'I'};
+
+const char FORWARD = 'f';
+const char DEFENCE = 'd';
+const char GOAL = 'g';
+
+const int NAMEWIDTH = 26;
+const int TEAMWIDTH = 6;
+const int GOALWIDTH = 2;
+const int ASSISTWIDTH = 7;
+
+////////////////////////////////////////////////
+// Player node structure
+////////////////////////////////////////////////
+
+typedef struct PlayerNode *PlayerPtr;
+
+struct PlayerNode
+{
+   char name[MAXNAMELEN+1];
+   char position;
+   int goals;
+   int assists;
+   int goalsAgainst;
+};
+
+
+
+////////////////////////////////////////////////
+// 
+////////////////////////////////////////////////
+
+class HockeyList
+{
+ public:
+  HockeyList();
+  ~HockeyList();
+
+  int  load(istream &infile);
+  void write(ostream &out) const;
+  void display(ostream &out) const;
+  bool move(int position);
+  bool activate(int position, char team);
+  bool update(int position, int goals, int assists, int goalsAgainst);
+  void lookup(int position, PlayerNode &player, bool &found) const;
+  char getTeam(int position) const;
+
+ private:
+  struct ListNode
+  {
+    ListNode *next;
+    ListNode *prev;
+    PlayerPtr thePlayer;
+  };
+
+  typedef ListNode *ListPtr;
+
+  int findTeamNumber(char teamLetter);
+  void search(int pos, ListPtr &item, int &team, bool &found) const;
+  ListPtr createNode(const char name[], char position, int goals, int assists, 
+                        int goalsAgainst) const;
+  void link(ListPtr item, int team);
+  void unlink(ListPtr item);
+  void displayTeam(int team, int &position, ostream &out) const;
+
+  ListNode head[NUMTEAMS];
+  ListNode tail[NUMTEAMS];
+};
+
+#endif
+TARGET = a4p2
+SOURCES = a4p2.cpp HockeyList.h HockeyList.cpp ioutil.cpp ioutil.h
+MODULES = $(SOURCES: .cpp = .o)
+CPPFLAGS = -ansi -pedantic-errors -Wall -Wconversion
+
+$(TARGET): clean $(MODULES)
+	g++ $(MODULES) $(CPPFLAGS) -o $(TARGET)
+
+clean:
+	/bin/rm -rf $(TARGET) *. *~ *.o
+
+all:	clean $(TARGET)
+
+.coo.o:
+	g++ $(CPPFLAGS) -c $<
+[ctabe297@ins.mtroyal.ca ~/assignments/a4p2> make
+/bin/rm -rf a4p2 *. *~ *.o
+g++ a4p2.cpp HockeyList.h HockeyList.cpp ioutil.cpp ioutil.h -ansi -pedantic-errors -Wall -Wconversion -o a4p2
+[ctabe297@ins.mtroyal.ca ~/assignments/a4p2> a4p2
+Do you want to run interactively (y/n)?  y
+Enter name of input file: team_rosters.txt
+
+Olympic Teams List Manager:
+
+d) display list
+m) move a player to injury reserve
+a) activate a player from injury reserve
+u) update player points
+s) show top scorer
+
+q) quit
+
+
+Your Choice:  s
+************************************************************
+
+Top Scorer is:
+
+Sarah Nurse with 15 total points
+
+************************************************************
+
+
+Olympic Teams List Manager:
+
+d) display list
+m) move a player to injury reserve
+a) activate a player from injury reserve
+u) update player points
+s) show top scorer
+
+q) quit
+
+
+Your Choice:  q
+Enter name of output file: ouput.txt       tput.txt
+
+Player list saved to file and program exiting.
+[ctabe297@ins.mtroyal.ca ~/assignments/a4p2> exit
+exit
+
+Script done on 2022-03-22 00:03:46-06:00

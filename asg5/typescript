@@ -1,0 +1,2158 @@
+Script started on 2022-04-08 22:29:23-06:00
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5> la[Ks -al
+total 4
+drwxr-xr-x 5 ctabe297 students.pg   54 Apr  8 22:29 .
+drwxr-xr-x 9 ctabe297 students.pg   88 Apr  8 19:56 ..
+drwxr-xr-x 2 ctabe297 students.pg   90 Apr  8 22:29 p1
+drwxr-xr-x 2 ctabe297 students.pg  210 Apr  8 20:06 p2
+drwxr-xr-x 2 ctabe297 students.pg 4096 Apr  8 20:06 p3
+-rw-r--r-- 1 ctabe297 students.pg    0 Apr  8 22:29 typescript
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5> cd p1
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p1> ls -al
+total 40
+drwxr-xr-x 2 ctabe297 students.pg    90 Apr  8 22:29 .
+drwxr-xr-x 5 ctabe297 students.pg    54 Apr  8 22:29 ..
+-rw-r--r-- 1 ctabe297 students.pg   129 Mar 23 17:53 globals.h
+-rw-r--r-- 1 ctabe297 students.pg  2392 Mar 23 18:03 Grid.cpp
+-rw-r--r-- 1 ctabe297 students.pg   916 Apr  2 23:51 Grid.h
+-rw-r--r-- 1 ctabe297 students.pg   642 Apr  8 13:45 makefile
+-rw-r--r-- 1 ctabe297 students.pg 20572 Apr  7 13:35 test_Grid.cpp
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p1> cat mk[Kakefile test_Grid.cpp 
+TESTS = test_Grid
+SOURCES = test_Grid.cpp Grid.cpp globals.h Grid.h
+MODULES = Grid.o
+CPPFAGS = -ansi -pedantic-errors -Wall -Wconversion -g
+GCOVFLAGS = -fprofile-arcs -ftest-coverage
+GCOVFILE = Grid
+GTFLAGS = -lgtest -lpthread -lgtest_main
+
+$(TESTS): $(TESTS).o Grid.o
+	g++ $(TESTS).o Grid.o $(GCOVFLAGS) $(GTFLAGS) -o $(TESTS)
+	./$(TESTS)
+	gcov $(GCOVFILE).cpp 2> /dev/null | grep -A 1 $(GCOVFILE).cpp
+clean:
+	/bin/rm -f *.o $(TESTS) *.*~ *.g*
+
+all:	clean $(TESTS)
+
+Grid.o: Grid.cpp globals.h
+	g++ $(CPPFLAGS) $(GTFLAGS) $(GCOVFLAGS) -c Grid.cpp 
+
+$(TESTS).o: test_Grid.cpp globals.h
+	g++ $(CPPFLAGS) $(GTFLAGS) $(GCOVFLAGS) -c $(TESTS).cpp
+#include <iostream>
+using namespace std;
+#include <sstream>
+#include <string>
+#include "Grid.h"
+#include <gtest/gtest.h>
+
+
+class GridTests : public testing::Test
+{
+protected:
+  virtual void SetUp()
+  {
+  }
+
+  virtual void TearDown()
+  {
+  }
+ 
+  Grid c;
+};
+
+/*******************************************************************************
+ *
+ * Name:                Clency Tabe
+ * Email:               ctabe297@mtroyal.ca
+ * Course:              COMP 1633, 001
+ * Assignment:          Assignment 5 part 1
+ * Due Date:            April 8, 2022
+ * Instructor name:     Paul Pospisil
+ * File name:           test_Grid.cpp
+ * Purpose:             This is a test module for the file "Grid.cpp". It tests
+ *                      various elements and components of the file.
+ * Assumptions:         All tests cases tests for the write function. That's how 
+ *                      expected and actual output are compared
+ *
+ *******************************************************************************/
+
+
+TEST_F(GridTests, DefaultConstructorTest)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(GridTests, TestOutputOperator)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "  *                                               \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_point(2, 2);
+  c.write(actualOutput);
+
+  cout << (actualOutput, c);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(GridTests, TestPlot_PointOffGrid)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  c.plot_point(-100, -100);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+
+TEST_F(GridTests, TestPlot_PointOnGrid)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  // 1 point on the grid
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "  *                                               \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_point(2, 1);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+
+  // 2 or more points on the grid
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "  *                                               \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "*                                                 \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                * \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_point(2, 1);
+  c.plot_point(48, 13);
+  c.plot_point(0, 9);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+  
+}
+
+TEST_F(GridTests, TestTwoOrMoreOverwrittenPointsOnGrid)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  // 2 over written points on the grid
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "  *                                               \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_point(2, 1);
+  c.plot_point(2, 1);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(GridTests, TestOutOfBoundsLine)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_line(-20,-2, -6, -12);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+  
+}
+
+TEST_F(GridTests, TestPartiallyOutOfBoundsLine)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "*******                                           \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_line(-20, 1, 6, 1);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+  
+}
+
+TEST_F(GridTests, TestDiagonalLine)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "  *                                               \n";
+  expected += "   *                                              \n";
+  expected += "    *                                             \n";
+  expected += "     *                                            \n";
+  expected += "      *                                           \n";
+  expected += "       *                                          \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_line(7, 6, 2, 1);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+  
+}
+
+TEST_F(GridTests, TestInBoundStraightLine)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "    *****************                             \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_line(4, 13, 20, 13);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+  
+}
+
+TEST_F(GridTests, TestOverWrittenLines)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  // EQUAL OVER WRITTEN LINES
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "    *****************                             \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_line(4, 13, 20, 13);
+  c.plot_line(4, 13, 20, 13);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+
+  // NON EQUAL OVER WRITTEN LINES
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "    *******************                           \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_line(4, 13, 20, 13);
+  c.plot_line(4, 13, 22, 13);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+  
+}
+
+TEST_F(GridTests, TestStraightIntersectingLines)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  // 2 straight lines intersecting
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                        *                         \n";
+  expected += "                        *                         \n";
+  expected += "                        *                         \n";
+  expected += "                        *                         \n";
+  expected += "                        *                         \n";
+  expected += "           ******************************         \n";
+  expected += "                        *                         \n";
+  expected += "                        *                         \n";
+  expected += "                        *                         \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_line(11, 8, 40, 8);
+  c.plot_line(24, 3, 24, 11);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+
+  // 3 straight lines intersecting
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                   *    *                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                     *  *                         \n";
+  expected += "                      * *                         \n";
+  expected += "                       **                         \n";
+  expected += "           ******************************         \n";
+  expected += "                        **                        \n";
+  expected += "                        * *                       \n";
+  expected += "                        *  *                      \n";
+  expected += "                            *                     \n";
+  expected += "                             *                    \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  c.plot_line(19, 3, 29, 13);
+  c.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+
+}
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p1> make
+g++  -lgtest -lpthread -lgtest_main -fprofile-arcs -ftest-coverage -c test_Grid.cpp
+g++  -lgtest -lpthread -lgtest_main -fprofile-arcs -ftest-coverage -c Grid.cpp 
+g++ test_Grid.o Grid.o -fprofile-arcs -ftest-coverage -lgtest -lpthread -lgtest_main -o test_Grid
+./test_Grid
+Running main() from gtest_main.cc
+[==========] Running 11 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 11 tests from GridTests
+[ RUN      ] GridTests.DefaultConstructorTest
+[       OK ] GridTests.DefaultConstructorTest (0 ms)
+[ RUN      ] GridTests.TestOutputOperator
+--------------------------------------------------
+                                                  
+                                                  
+  *                                               
+                                                  
+                                                  
+                                                  
+                                                  
+                                                  
+                                                  
+                                                  
+                                                  
+                                                  
+                                                  
+                                                  
+                                                  
+--------------------------------------------------
+[       OK ] GridTests.TestOutputOperator (0 ms)
+[ RUN      ] GridTests.TestPlot_PointOffGrid
+[       OK ] GridTests.TestPlot_PointOffGrid (0 ms)
+[ RUN      ] GridTests.TestPlot_PointOnGrid
+[       OK ] GridTests.TestPlot_PointOnGrid (0 ms)
+[ RUN      ] GridTests.TestTwoOrMoreOverwrittenPointsOnGrid
+[       OK ] GridTests.TestTwoOrMoreOverwrittenPointsOnGrid (0 ms)
+[ RUN      ] GridTests.TestOutOfBoundsLine
+[       OK ] GridTests.TestOutOfBoundsLine (0 ms)
+[ RUN      ] GridTests.TestPartiallyOutOfBoundsLine
+[       OK ] GridTests.TestPartiallyOutOfBoundsLine (0 ms)
+[ RUN      ] GridTests.TestDiagonalLine
+[       OK ] GridTests.TestDiagonalLine (0 ms)
+[ RUN      ] GridTests.TestInBoundStraightLine
+[       OK ] GridTests.TestInBoundStraightLine (0 ms)
+[ RUN      ] GridTests.TestOverWrittenLines
+[       OK ] GridTests.TestOverWrittenLines (0 ms)
+[ RUN      ] GridTests.TestStraightIntersectingLines
+[       OK ] GridTests.TestStraightIntersectingLines (0 ms)
+[----------] 11 tests from GridTests (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 11 tests from 1 test case ran. (0 ms total)
+[  PASSED  ] 11 tests.
+gcov Grid.cpp 2> /dev/null | grep -A 1 Grid.cpp
+File 'Grid.cpp'
+Lines executed:100.00% of 64
+Creating 'Grid.cpp.gcov'
+
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p1> cd ../p2
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p2> ls -al
+total 72
+drwxr-xr-x 2 ctabe297 students.pg   210 Apr  8 20:06 .
+drwxr-xr-x 5 ctabe297 students.pg    54 Apr  8 22:29 ..
+-rw-r--r-- 1 ctabe297 students.pg   129 Mar 27 22:43 globals.h
+-rw-r--r-- 1 ctabe297 students.pg  2473 Mar 27 20:55 Grid.cpp
+-rw-r--r-- 1 ctabe297 students.pg   407 Mar 27 20:55 Grid.h
+-rw-r--r-- 1 ctabe297 students.pg  1404 Apr  8 13:46 makefile
+-rw-r--r-- 1 ctabe297 students.pg  7911 Apr  8 19:29 Shape_Collection.cpp
+-rw-r--r-- 1 ctabe297 students.pg  3639 Apr  7 13:57 Shape_Collection.h
+-rw-r--r-- 1 ctabe297 students.pg  3209 Apr  8 19:37 Shape.cpp
+-rw-r--r-- 1 ctabe297 students.pg  2937 Apr  7 12:43 Shape.h
+-rw-r--r-- 1 ctabe297 students.pg 18265 Apr  8 19:30 test_Shape_Collection.cpp
+-rw-r--r-- 1 ctabe297 students.pg 15598 Apr  8 12:56 test_Shape.cpp
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p2> cat [K[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p2> cat makefile test_Shape.cpp Shape.h Shape.cpp te st_Shape_Collection.cpp Shape_Collection.h Shape_Collection.cpp 
+test_Shape = test_Shape
+test_Shape_Collection = test_Shape_Collection
+
+SHAPE_SOURCES = Shape
+SHAPE_COLLECTION_SOURCES = Shape_Collection
+
+SHAPE_MODULES = test_Shape.o Shape.o Grid.o
+SHAPE_COLLECTION_MODULES = test_Shape_Collection.o Shape_Collection.o Shape.o Grid.o
+
+CPPFLAGS = -ansi -pedantic-errors -Wall -Wconversion -g
+GCOVFLAGS = -fprofile-arcs -ftest-coverage
+GTFLAGS = -lgtest -lpthread -lgtest_main
+
+SHAPE = Shape
+SHAPE_COLLECTION = Shape_Collection
+
+$(test_Shape): $(test_Shape).o Grid.o Shape.o
+	g++ $(test_Shape).o Grid.o Shape.o $(GCOVFLAGS) $(CPPFLAGS) $(GTFLAGS) -o $(test_Shape)
+	$(test_Shape)
+	gcov $(SHAPE).cpp 2> /dev/null | grep -A 1 $(SHAPE).cpp
+
+$(test_Shape_Collection): $(test_Shape_Collection).o Shape.o Grid.o Shape_Collection.o
+	g++ $(test_Shape_Collection).o Shape.o Grid.o Shape_Collection.o $(GCOVFLAGS) $(CPPFLAGS) $(GTFLAGS) -o $(test_Shape_Collection)
+	$(test_Shape_Collection)
+	gcov $(SHAPE_COLLECTION).cpp 2> /dev/null | grep -A 1 $(SHAPE_COLLECTION).cpp
+
+clean:
+	/bin/rm -f *.o $(test_Shape) $(test_Shape_Collection) *.*~ *.g*
+
+all:	clean $(test_Shape) $(test_Shape_Collection)
+
+Grid.o: Grid.cpp globals.h
+	g++ $(CPPFLAGS) $(GTFLAGS) $(GCOVFLAGS) -c Grid.cpp
+
+
+Shape.o: Shape.cpp Shape.h
+	g++ $(CPPFLAGS) $(GTFLAGS) $(GCOVFLAGS) -c Shape.cpp
+
+Shape_Collection.o: Shape_Collection.cpp Shape_Collection.h
+	g++ $(CPPFLAGS) $(GTFLAGS) $(GCOVFLAGS) -c Shape_Collection.cpp
+#include <iostream>
+using namespace std;
+#include <sstream>
+#include <string>
+#include "Grid.h"
+#include "Shape.h"
+#include <gtest/gtest.h>
+
+
+class Shape_Tests : public testing::Test
+{
+protected:
+  virtual void SetUp()
+  {
+  }
+
+  virtual void TearDown()
+  {
+  }
+
+  Grid c;
+};
+
+
+/**********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Assignment:       Assignment 5, part 2
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        test_Shape.cpp
+ * Purpose:          test the interaction between functions from the
+ *                   files "Grid.h" and "Shape.h"
+ *
+ **********************************************************************/
+
+
+// ALL TESTS CASES TESTS THE DRAW FUNCTION. THAT'S HOW EXPECTED
+// AND ACTUAL OUPUT ARE COMPARED
+
+TEST_F(Shape_Tests, TestShapeConstructor_ShapesOnGrid)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  // 1 SHAPE
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****                                            \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  Grid aGrid;
+
+  Shape shape1 (1, 1, 5);
+  shape1.draw(aGrid);
+
+  aGrid.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Tests, TestShapesOverWrittenOnShape)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  // 2 OR MORE SHAPES
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " * ********                                       \n";
+  expected += " * * *    *                                       \n";
+  expected += " *****    *                                       \n";
+  expected += "   *      *                                       \n";
+  expected += "   *      *                                       \n";
+  expected += "   *      *                                       \n";
+  expected += "   *      *                                       \n";
+  expected += "   ********                                       \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  Grid aGrid;
+
+  Shape shape1 (1, 1, 5);
+  Shape shape2 (3, 3, 8);
+
+  shape1.draw(aGrid);
+  shape2.draw(aGrid);
+
+  aGrid.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+
+
+  // 3 OR MORE SHAPES
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += "***  *                                            \n";
+  expected += "***********                                       \n";
+  expected += "**** *    *                                       \n";
+  expected += " *****    *                                       \n";
+  expected += "   *      *                                       \n";
+  expected += "   *      *                                       \n";
+  expected += "   *      *                                       \n";
+  expected += "   *      *                                       \n";
+  expected += "   ********                                       \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  Shape shape3 (0, 2, 3);
+
+  shape3.draw(aGrid);
+
+  aGrid.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Tests, PartialOutOfBoundsShape)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "******                                            \n";
+  expected += "     *                                            \n";
+  expected += "     *                                            \n";
+  expected += "     *                                            \n";
+  expected += "     *                                            \n";
+  expected += "     *                                            \n";
+  expected += "     *                                            \n";
+  expected += "     *                                            \n";
+  expected += "     *                                            \n";
+  expected += "******                                            \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  Grid aGrid;
+
+  Shape shape (-4, 1, 10);
+  shape.draw(aGrid);
+
+  aGrid.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Tests, MovingAShapeWithinGrid)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****                                            \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "          *****                                   \n";
+  expected += "          *   *                                   \n";
+  expected += "          *   *                                   \n";
+  expected += "          *   *                                   \n";
+  expected += "          *****                                   \n";
+  expected += "--------------------------------------------------\n";
+  
+  Grid aGrid;
+  
+  Shape shape (1, 1, 5);
+  shape.draw(aGrid);
+  
+  shape.move(10, 10);
+  shape.draw(aGrid);
+
+  aGrid.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Tests, MoveCompletelyOutOfBounds)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****                                            \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  Grid aGrid;
+  
+  Shape shape (1, 1, 5);
+  shape.draw(aGrid);
+  
+  shape.move(-100, -100);
+  shape.draw(aGrid);
+  
+  aGrid.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Tests, MovingShapeWithingItsSelf)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " ******                                           \n";
+  expected += " **  **                                           \n";
+  expected += " **  **                                           \n";
+  expected += " ******                                           \n";
+  expected += "  *****                                           \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  Grid aGrid;
+
+  Shape shape (1, 1, 5);
+  shape.draw(aGrid);
+
+  shape.move(2, 2);
+  shape.draw(aGrid);
+
+
+  aGrid.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Tests, MoveOnAnotherShape)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "     *****                                        \n";
+  expected += "     *   *                                        \n";
+  expected += "     *   *                                        \n";
+  expected += "     *   *             *****                      \n";
+  expected += "     *****             *   *                      \n";
+  expected += "                       *  *******                 \n";
+  expected += "                       *  **    *                 \n";
+  expected += "                       *****    *                 \n";
+  expected += "                          *     *                 \n";
+  expected += "                          *     *                 \n";
+  expected += "                          *     *                 \n";
+  expected += "                          *******                 \n";
+  expected += "--------------------------------------------------\n";
+
+  Grid aGrid;
+
+  Shape shape1 (5, 3, 5);
+  shape1.draw(aGrid);
+
+  Shape shape2 (26, 8, 7);
+  shape2.draw(aGrid);
+
+  shape1.draw(aGrid);
+  shape2.draw(aGrid);
+
+  shape1.move(23, 6);
+  shape1.draw(aGrid);
+
+  aGrid.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Tests, MovePartiallyOutOfBounds)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "     *****                                        \n";
+  expected += "     *   *                                        \n";
+  expected += "     *   *                                        \n";
+  expected += "     *   *                                        \n";
+  expected += "     *****                                        \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "     *****                                        \n";
+  expected += "     *   *                                        \n";
+  expected += "--------------------------------------------------\n";
+
+  Grid aGrid;
+
+  Shape shape (5, 3, 5);
+  shape.draw(aGrid);
+
+  shape.move(5, 13);
+  shape.draw(aGrid);
+
+  aGrid.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Tests, MoveOutofBoundsShapeInBound)
+{
+  stringstream actualOutput;
+  string expected = "";
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "     *****                                        \n";
+  expected += "     *   *                                        \n";
+  expected += "     *   *                                        \n";
+  expected += "     *   *                                        \n";
+  expected += "     *****                                        \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  Grid aGrid;
+
+  Shape shape (-50, -30, 5);
+  shape.draw(aGrid);
+
+  shape.move(5, 3);
+  shape.draw(aGrid);
+
+  aGrid.write(actualOutput);
+  EXPECT_EQ(expected, actualOutput.str());
+}
+#ifndef SHAPE_H
+#define SHAPE_H
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+#include "Grid.h"
+#include "globals.h"
+
+/******************************************************************************
+ * 
+ * Name:             Clency Tabe 
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Assignment:       Assignemnt 5 part 2
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        Shape.h
+ * Purpose:          This is a .h file for the file "Shape.cpp"
+ *                   It contains the definition of a class called shape.
+ *                   This class is able to create a shape, move it and draw it on
+ *                   a grid.
+ *
+ ****************************************************************************/
+
+
+/******************************************************************************
+ *
+ * CLASS: Shape
+ *
+ * PURPOSE: Creates a square shape
+ *
+ ******************************************************************************
+ *
+ * PUBLIC METHODS:
+ *
+ ******************************************************************************
+ *
+ * Shape
+ *     PURPOSE: creates a shape using passed in arguments
+ *     
+ *     INPUT: lft - coordinate of the left corner of the box
+ *            up - coordinate of the upper corner of the box
+ *            width - lenght of the width of the box
+ *            
+ ******************************************************************************
+ *
+ * move
+ *     PURPOSE: moves a shape using passed in arguments
+ *
+ *     INPUT: new_left - coordinate of the new left corner of the box
+ *            new_upper - coordinate of the new upper corner of the box
+ *
+ ******************************************************************************
+ *
+ * draw
+ *     PURPOSE: draws a shape on a grid (shape can be out of bounds
+ *
+ *     INPUT: grid - a grid
+ *
+ ******************************************************************************
+ *
+ * PROTECTED FUNCTIONS:
+ *
+ ******************************************************************************
+ *
+ * get_bounding_box
+ *     PURPOSE: gets the bounding box of a shape and returns them by reference
+ *             using the passed in arguments
+ *
+ *     INPUT: lft - coordinate of the left corner of the box
+ *            up - coordinate of the upper corner of the box
+ *            rght - coordinate of the right corner of the box
+ *            low - coordinate of the lower corner of the box
+ *
+ ******************************************************************************/
+
+
+class Shape
+{
+public:
+  Shape(int lft, int up, int width);
+
+  void move(int new_left, int new_upper);
+
+  void draw(Grid &grid);
+
+protected:
+  void get_bounding_box(int &lft, int &up, int &rght, int &low) const;
+
+private:
+  int left;
+  int upper;
+  int right;
+  int lower;
+};
+
+#endif
+#include "Shape.h"
+#include "Grid.h"
+#include "globals.h"
+
+// IMPLEMTATONS OF THE "SHAPE.H" FILE.
+
+/**************************************************************************
+ *
+ * Name:                 Clency Tabe
+ * Email:                ctabe297@mtroyal.ca
+ * Course:               COMP 16333, 001
+ * Due Date:             April 8, 2022
+ * Instructor Name:      Paul Pospisil
+ * File name:            Shape.cpp
+ *
+ **************************************************************************/
+
+/**************************************************************************
+ *
+ * Function:    Shape
+ * Purpose:     Set the coordinates of the bounding box of a shape using
+ *              provided passed in arguments
+ * Input:       x and ycoordiantes for upper left corner of bounding box, and
+ *              width of the shape box.
+ * Output:      None
+ * Return:      None
+ *
+ **************************************************************************/
+Shape :: Shape(int lft, int up, int width)
+{
+  left = lft;
+  upper = up;
+  right = left + width - 1;
+  lower = upper + width - 1;
+}
+
+
+/**************************************************************************
+ * 
+ * Function:   move
+ * Purpose:    Moves a shape by setting the new coordinates of the bounding
+ *             box using the passed-in new x and y coordiantes for upper left
+ *             corner of bounding box of an existing shape
+ * Input:      new x and y coordiantes for upper left corner of bounding box
+ * Output:     None
+ * Return:     None
+ *
+ **************************************************************************/
+void Shape :: move(int new_left, int new_upper)
+{
+  int new_right;
+  int new_lower;
+  
+  get_bounding_box(new_left, new_upper, new_right, new_lower);
+
+  left = new_left;
+  upper = new_upper;
+  right = new_right;
+  lower = new_lower;
+}
+
+
+/**************************************************************************
+ * 
+ * Function:   draw
+ * Purpose:    Draws an exsiting shape on a Grid using a function from the
+ *             grid class
+ * Input:      grid
+ * Output:     None
+ * Return:     None
+ *
+ **************************************************************************/
+void Shape :: draw (Grid &grid)
+{
+  grid.plot_line(left, upper, right, upper);
+  grid.plot_line(left, upper, left, lower);
+  grid.plot_line(right, upper, right, lower);
+  grid.plot_line(left, lower, right, lower);
+}
+
+/**************************************************************************
+ * 
+ * Function:   get_bounding_box
+ * Purpose:    Gets the coordinates of the bounding box i.e the x and 
+ *             y coordiantes for upper left corner, the x and y coordiantes
+ *             for lower right corner of the bounding box
+ * Input:      4 interger values to be set to the required coordiantes
+ * Output:     all interger values to be returned as the required coordinates
+ * Return:     None
+ *
+ **************************************************************************/
+void Shape :: get_bounding_box(int &lft, int &up, int &rght, int &low) const
+{
+  int width = right - left;
+
+  rght = lft + width;
+  low = up + width;
+}
+#include <iostream>
+using namespace std;
+#include <sstream>
+#include <string>
+#include "Grid.h"
+#include "Shape.h"
+#include "Shape_Collection.h"
+#include <gtest/gtest.h>
+
+
+class Shape_Collection_Tests : public testing::Test
+{
+protected:
+  virtual void SetUp()
+  {
+  }
+
+  virtual void TearDown()
+  {
+  }
+ 
+  Grid c;
+};
+
+
+/**********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Assignment:       Assignment 5, part 2
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        test_Shape_Collection.cpp
+ * Purpose:          test the interaction between functions from the
+ *                   files "Grid.h", "Shape.h" and "Shape_Collecton".
+ * Assumptions:      SHAPE_COLLECTION ALL TETS CASES TESTS THE DRAW_SHAPES
+ *                   FUNCTION. THATS HOW EXPECTED AND ACTUAL OUPUT ARE
+ *                   COMPARED
+ * Limitations:      100% COVERAGE IS IMPOSSIBLE BECUASE OF THE TWO
+ *                   PRIVATE FUNCTIONS THAT ARE STUBS AND NO PUBLIC
+ *                   FUNCTION USES THEM
+ * 
+ **********************************************************************/
+
+
+TEST_F(Shape_Collection_Tests, TestShapeCollectionConstructor)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  Shape_Collection myShapes;
+  
+  myShapes.draw_shapes(actualOutput);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Collection_Tests, TestShapeCollectionAddShape)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****              *****                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += " *****              *****                         \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****                                            \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  Shape_Collection myShapes;
+  Shape *aShape;
+
+  aShape = new Shape(1,1,5);
+  myShapes.add(aShape, "S1");
+
+  aShape = new Shape(1,9,5);
+  myShapes.add(aShape, "S2");
+
+  aShape = new Shape(20,5,5);
+  myShapes.add(aShape, "S3");
+  
+  myShapes.draw_shapes(actualOutput);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Collection_Tests, TestShapeCollectionAddNonExistingShape)
+{
+
+  // 1 SHAPE
+  
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****                                            \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  Shape_Collection myShapes;
+  Shape *aShape;
+
+  aShape = new Shape(1,1,5);
+  myShapes.add(aShape, "S1");
+
+  myShapes.draw_shapes(actualOutput);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+
+  // 2 OR MORE SHAPES
+
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****              *****                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += " *****              *****                         \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****                                            \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+
+  aShape = new Shape(1,9,5);
+  myShapes.add(aShape, "S2");
+
+  aShape = new Shape(20,5,5);
+  myShapes.add(aShape, "S3");
+  
+  myShapes.draw_shapes(actualOutput);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Collection_Tests, TestShapeCollectionRemoveExistingShape)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****              *****                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *****                         \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  Shape_Collection myShapes;
+  Shape *aShape;
+
+  aShape = new Shape(1,1,5);
+  myShapes.add(aShape, "S1");
+
+  aShape = new Shape(1,9,5);
+  myShapes.add(aShape, "S2");
+
+  aShape = new Shape(20,5,5);
+  myShapes.add(aShape, "S3");
+
+  myShapes.remove("S2");
+  
+  myShapes.draw_shapes(actualOutput);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Collection_Tests, TestShapeCollectionRemoveNonExistingShape)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****              *****                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += " *****              *****                         \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****                                            \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  Shape_Collection myShapes;
+  Shape *aShape;
+
+  aShape = new Shape(1,1,5);
+  myShapes.add(aShape, "S1");
+
+  aShape = new Shape(1,9,5);
+  myShapes.add(aShape, "S2");
+
+  aShape = new Shape(20,5,5);
+  myShapes.add(aShape, "S3");
+
+  myShapes.remove("S4");
+  
+  myShapes.draw_shapes(actualOutput);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Collection_Tests, TestShapeCollectionLookupExistingShape)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****                                            \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  Shape_Collection myShapes;
+  Shape *aShape;
+
+  Shape *found = NULL;
+  
+  aShape = new Shape(1,9,5);
+  myShapes.add(aShape, "S1");
+
+  found = myShapes.lookup("S1");
+  
+  myShapes.draw_shapes(actualOutput);
+  EXPECT_EQ(found, aShape);
+}
+
+TEST_F(Shape_Collection_Tests, TestShapeCollectionLookupNonExistingShape)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                    *****                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += " *****              *****                         \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****                                            \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  Shape_Collection myShapes;
+  Shape *aShape;
+
+  Shape *found = NULL;
+  
+  aShape = new Shape(1,9,5);
+  myShapes.add(aShape, "S1");
+
+  aShape = new Shape(20,5,5);
+  myShapes.add(aShape, "S2");
+
+  aShape = myShapes.lookup("S3");
+  
+  myShapes.draw_shapes(actualOutput);
+  
+  EXPECT_EQ(found, aShape);
+}
+
+TEST_F(Shape_Collection_Tests, TestShapeCollectionLookupEmptyShapeCollection)
+{
+  Shape_Collection myShapes;
+  Shape *aShape;
+
+  Shape *found = NULL;
+  
+  aShape = myShapes.lookup("S1");
+  
+  EXPECT_EQ(found, aShape);
+}
+
+TEST_F(Shape_Collection_Tests, TestShapeCollectionWriteNamesOnNonEmptyShapeCollection)
+{  
+  Shape_Collection myShapes;
+  Shape *aShape;
+
+  stringstream actualOutput;
+  string expected = "[S3,S2,S1]";
+  
+  aShape = new Shape(1,1,5);
+  myShapes.add(aShape, "S1");
+
+  aShape = new Shape(1,9,5);
+  myShapes.add(aShape, "S2");
+
+  aShape = new Shape(20,5,5);
+  myShapes.add(aShape, "S3");
+  
+  myShapes.write_names(actualOutput);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Collection_Tests, TestShapeCollectionWriteNamesOnEmptyShapeCollection)
+{
+  stringstream actualOutput;
+  string expected = "[]";
+   
+  Shape_Collection myShapes;
+
+  myShapes.write_names(actualOutput);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Collection_Tests, TestDrawShapesOnEmptyShapeCollection)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  Shape_Collection myShapes;
+  
+  myShapes.draw_shapes(actualOutput);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+}
+
+TEST_F(Shape_Collection_Tests, TestDrawShapesOnNonEmptyShapeCollection_)
+{
+  stringstream actualOutput;
+  string expected = "";
+  
+  expected += "--------------------------------------------------\n";
+  expected += "                                                  \n";
+  expected += " *****                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****              *****                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += "                    *   *                         \n";
+  expected += " *****              *****                         \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *   *                                            \n";
+  expected += " *****                                            \n";
+  expected += "                                                  \n";
+  expected += "--------------------------------------------------\n";
+  
+  Shape_Collection myShapes;
+  Shape *aShape;
+
+  aShape = new Shape(1,1,5);
+  myShapes.add(aShape, "S1");
+
+  aShape = new Shape(1,9,5);
+  myShapes.add(aShape, "S2");
+
+  aShape = new Shape(20,5,5);
+  myShapes.add(aShape, "S3");
+  
+  myShapes.draw_shapes(actualOutput);
+  
+  EXPECT_EQ(expected, actualOutput.str());
+}
+#ifndef SHAPE_COLLECTION
+#define SHAPE_COLLECTION
+
+#include <string>
+
+using namespace std;
+
+#include "Shape.h"
+
+/********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        Shape_Collection.h
+ *
+ ********************************************************************/
+
+/*********************************************************************
+ *
+ *  CLASS: Shape_Collection
+ *
+ *  PURPOSE: A collection of pointers to shape objects.
+ *           The order of elements is irrelevant.
+ * 
+ *  Each shape is associated with a name used for lookup and removal.
+ *  The shapes are assumed to have been dynamically allocated from the 
+ *  heap by the client.
+ *  The collection takes custody of these shapes, and therefore it will 
+ *  deallocate them as necessary.
+ *
+ *  ASSUMPTIONS: 
+ *  1. The client never adds duplicate shape pointers
+ *  2. The client never adds a shape under an already-existing name
+ *
+ *********************************************************************
+ *
+ *  PUBLIC METHODS:
+ *
+ *********************************************************************
+ *
+ *  Shape_Collection
+ *         PURPOSE: initializes an empty collection
+ *
+ *********************************************************************
+ *
+ *  ~Shape_Collection
+ *         PURPOSE: deallocates all shape objects
+ *
+ *********************************************************************
+ *
+ *  add
+ *         PURPOSE: adds the given shape pointer to the collection,
+ *                  associating it with the given name.
+ *
+ *         INPUT: shape - a pointer to a dynamically allocated shape
+ *                name  - the name to associated with the shape
+ *
+ *********************************************************************
+ *
+ *  remove
+ *
+ *         PURPOSE: removes the named shape from the collection, if it
+ *                  exists.  The shape object is deallocated.
+ *
+ *         INPUT: name - the name of the shape to remove
+ *
+ *********************************************************************
+ *
+ *  lookup
+ *
+ *         PURPOSE: retrieves the pointer to the named shape
+ *
+ *         INPUT: name - the name of the shape to look up
+ *
+ *         RETURNS: the pointer, or NULL if no such shape
+ *
+ *********************************************************************
+ *
+ *  draw_shapes
+ *
+ *         PURPOSE: renders all shapes in the collection
+ *
+ *         INPUT: out - the output stream to use
+ *
+ *         OUTUPT: out - the output stream has been written to
+ *
+ *********************************************************************
+ *
+ *  write_names
+ *
+ *         PURPOSE: writes the list of shape names in the collection
+ *
+ *         INPUT: out - the output stream to use
+ *
+ *         OUTPUT: out - the output stream has been written to
+ *
+ *********************************************************************/
+
+
+class Shape_Collection
+{
+public:
+   Shape_Collection ();
+   ~Shape_Collection ();
+
+   void add (Shape* shape, string name);
+   void remove (string name);
+
+   Shape* lookup (string name) const;
+
+   void draw_shapes (ostream& out) const;
+   void write_names (ostream& out) const;
+
+private:
+   struct Node
+   {
+      Node* next;
+      Node* prev;
+
+      Shape* shape;
+      string name;
+   };
+
+   Shape_Collection (const Shape_Collection& orig);
+   Shape_Collection& operator= (const Shape_Collection& rhs);
+
+   void remove_all ();
+   Node* lookup_node (string name) const;
+   Node* head;
+};
+
+
+#endif
+#include "Shape_Collection.h"
+
+/********************************************************************
+ *
+ * Name:             Clency Tabe
+ * Email:            ctabe297@mtroyal.ca
+ * Course:           COMP 1633, 001
+ * Due Date:         April 8, 2022
+ * Instructor name:  Paul Pospisil
+ * File name:        Shape_Collection.cpp
+ *
+ ********************************************************************/
+
+
+/*********************************************************************
+ *
+ *  CLASS: Shape_Collection
+ *
+ *  PURPOSE: A collection of pointers to shape objects.
+ *           The order of elements is irrelevant.
+ *
+ *  PRIVATE DATA MEMBERS:
+ *
+ *  head - a pointer to the head node of a doubly linked list, NULL if
+ *         the list is empty
+ *
+ *  NOTES:
+ *  Each node contains:
+ *
+ *       - a pointer to the "next" node, NULL for tail node
+ *
+ *       - a pointer to the "prev" (previous) node, NULL for head node
+ *
+ *       - shape: a pointer to a dynamically allocated shape object
+ *
+ *       - name: the name associated with that shape
+ *
+ *  The list is doubly linked to simplify the implementation of "remove".
+ *  The "lookup_node" helper function returns a pointer to a node.  
+ *  Therefore, "remove" can simply take this node, unlink it from its 
+ *  "prev" and "next" neighbours (if any), and then deallocate.
+ *
+ *********************************************************************/
+
+/*********************************************************************
+ *
+ *  FUNCTION: Shape_Collection
+ *
+ *  PURPOSE: initializes an empty collection.
+ *
+ *********************************************************************/
+
+Shape_Collection :: Shape_Collection () : head (NULL)
+{
+}
+
+
+/*********************************************************************
+ *
+ *  FUNCTION: ~Shape_Collection
+ *
+ *  PURPOSE: deallocates all dynamically allocated
+ *           memory by removing all nodes.
+ *
+ *********************************************************************/
+
+Shape_Collection :: ~Shape_Collection ()
+{
+  while (head != NULL)
+    remove(head->name);
+}
+
+
+/*********************************************************************
+ *
+ *  FUNCTION: add
+ *
+ *  PURPOSE: adds the given shape pointer to the collection,
+ *           associating it with the given name.
+ *
+ *  METHOD: - allocate the node
+ *          - link it in at the front of the list
+ *          - store the shape pointer and name inside
+ *
+ *  INPUT: shape - a pointer to a dynamically allocated shape
+ *         name  - the name to associated with the shape
+ *
+ *********************************************************************/
+
+void Shape_Collection :: add (Shape* shape, string name)
+{
+  Node* new_node = new Node;
+
+  new_node->next = head;
+  new_node->prev = NULL;
+  new_node->shape = shape;
+  new_node->name = name;
+   
+  if (head != NULL)
+    head->prev = new_node;
+
+  head = new_node;
+}
+
+/*********************************************************************
+ *
+ *  FUNCTION: remove
+ *
+ *  PURPOSE: removes the named shape from the collection, if it exists.
+ *           The shape object is deallocated.
+ *
+ *  METHOD: - look up the node
+ *          - if it exists:
+ *               - if it has a successor, set successor's 
+ *                 predecessor to by-pass this node
+ *               - if it has a predecessor, set predecessor's
+ *                 successor to by-pass this node
+ *               - if it has no predecessor (i.e. it was at the
+ *                 front of the list) update the head pointer
+ *               - deallocate the shape object
+ *               - deallocate the node
+ *
+ *  INPUT: name - the name of the shape to remove
+ *
+ *********************************************************************/
+
+void Shape_Collection :: remove (string name)
+{
+  Node* gone = lookup_node (name);
+
+  if (gone != NULL)
+    {
+      if (gone->next != NULL)
+	gone->next->prev = gone->prev;
+   
+      if (gone->prev != NULL)
+	gone->prev->next = gone->next;
+      else
+	head = gone->next;
+
+      delete gone->shape;
+      delete gone;
+    }
+}
+
+
+/*********************************************************************
+ *
+ *  FUNCTION: lookup
+ *
+ *  PURPOSE: retrieves the pointer to the named shape
+ *
+ *  INPUT: name - the name of the shape to look up
+ *
+ *  RETURNS: the pointer, or NULL if no such shape
+ *
+ *********************************************************************/
+
+Shape* Shape_Collection :: lookup (string name) const
+{
+  Shape* found = NULL;
+  Node* gotit = lookup_node(name);
+
+  if (gotit != NULL)
+    found = gotit->shape;
+
+  return found;
+}
+
+/*********************************************************************
+ *
+ * FUNCTION: draw_shapes
+ * 
+ * PURPOSE: draw all shapse in the shape collection on an output stream
+ *
+ * INPUT: out - an output stream where all all shapes will be printed on
+ *
+ * OUTPUT: Drawn shapes on given grid
+ *
+ * RETURN: NONE
+ *
+ * METHOD: the function creates a Grid where all shapes will be printed
+ *         then, a current node traverses the linked list printing all
+ *         shapes on that Grid. At the end, the Grid with printed shapes
+ *         in outputed through the output stream. 
+ *
+ *********************************************************************/
+
+void Shape_Collection :: draw_shapes (ostream& out) const
+{
+  Node *curr = head;
+  Grid aGrid;
+  
+  while(curr != NULL)
+    {
+      curr->shape->draw(aGrid);
+      curr = curr->next;
+    }
+  out << aGrid;
+}
+
+/*********************************************************************
+ *
+ * FUNCTION: write_names
+ *
+ * PURPOSE:  write names of all the shapes in the shape collection
+ *
+ * INPUT:    out - an output stream where all all shapes will be printed on
+ *
+ * OUTPUT: All names of shapse written on given outputstream
+ *
+ * RETURN: NONE
+ *
+ * METHOD:   the function goes through the linked list of shapes writing 
+ *           each shapes name to the output stream
+ *            
+ *********************************************************************/
+
+void Shape_Collection :: write_names (ostream& out) const
+{
+  Node *curr = head;
+
+  out << "[";
+  if(curr != NULL){
+    while(curr != NULL)
+      {
+	out << curr->name;
+	if(curr->next != NULL)
+	  out << ",";
+	curr = curr->next;
+      }
+  }
+  out << "]";
+}
+
+/*********************************************************************
+
+ *********************************************************************/
+
+Shape_Collection :: Shape_Collection (const Shape_Collection& orig)
+{
+  // DUMMY IMPLEMENTATION - NOT CALLABLE FROM CLIENT
+}
+
+
+/*********************************************************************
+
+ *********************************************************************/
+
+Shape_Collection& Shape_Collection :: operator = (const Shape_Collection& rhs)
+{
+  // DUMMY IMPLEMENTATION - NOT CALLABLE FROM CLIENT
+  return *this;
+}
+
+
+/*********************************************************************
+ *
+ *  FUNCTION: lookup_node
+ *
+ *  PURPOSE: looks up the node with the given name
+ *
+ *  METHOD: sequential search algorithm
+ *
+ *  INPUT: name - the name of the shape to look up
+ *
+ *  RETURNS: a pointer to the node containing the named shape, NULL
+ *           if not found
+ *
+ *  REMARKS:
+ *      Node is defined in the private data area of the Shape_Collection
+ *      class. As a consequence, when it is returned directly, its 
+ *      "location" must be resolved by using the scope operator as a
+ *      prefix
+ *      i.e.  return type of Shape_Collection::Node*
+ *            says "you can find this definition in
+ *            the Shape_Collection class"
+ *********************************************************************/
+
+Shape_Collection::Node* Shape_Collection :: lookup_node (string name) const
+{
+  bool found = false;
+  Node* curr = head;
+
+  while (!found && curr != NULL)
+    {
+      if (curr->name == name)            // can use with C++ string class
+	found = true;
+      else
+	curr = curr->next;
+    }
+  return curr;
+}
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p2> make test_Shape
+g++  -ansi -pedantic-errors -Wall -Wconversion -g  -c -o test_Shape.o test_Shape.cpp
+g++ -ansi -pedantic-errors -Wall -Wconversion -g -lgtest -lpthread -lgtest_main -fprofile-arcs -ftest-coverage -c Grid.cpp
+g++ -ansi -pedantic-errors -Wall -Wconversion -g -lgtest -lpthread -lgtest_main -fprofile-arcs -ftest-coverage -c Shape.cpp
+g++ test_Shape.o Grid.o Shape.o -fprofile-arcs -ftest-coverage -ansi -pedantic-errors -Wall -Wconversion -g -lgtest -lpthread -lgtest_main -o test_Shape
+test_Shape
+Running main() from gtest_main.cc
+[==========] Running 9 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 9 tests from Shape_Tests
+[ RUN      ] Shape_Tests.TestShapeConstructor_ShapesOnGrid
+[       OK ] Shape_Tests.TestShapeConstructor_ShapesOnGrid (1 ms)
+[ RUN      ] Shape_Tests.TestShapesOverWrittenOnShape
+[       OK ] Shape_Tests.TestShapesOverWrittenOnShape (0 ms)
+[ RUN      ] Shape_Tests.PartialOutOfBoundsShape
+[       OK ] Shape_Tests.PartialOutOfBoundsShape (0 ms)
+[ RUN      ] Shape_Tests.MovingAShapeWithinGrid
+[       OK ] Shape_Tests.MovingAShapeWithinGrid (0 ms)
+[ RUN      ] Shape_Tests.MoveCompletelyOutOfBounds
+[       OK ] Shape_Tests.MoveCompletelyOutOfBounds (0 ms)
+[ RUN      ] Shape_Tests.MovingShapeWithingItsSelf
+[       OK ] Shape_Tests.MovingShapeWithingItsSelf (0 ms)
+[ RUN      ] Shape_Tests.MoveOnAnotherShape
+[       OK ] Shape_Tests.MoveOnAnotherShape (0 ms)
+[ RUN      ] Shape_Tests.MovePartiallyOutOfBounds
+[       OK ] Shape_Tests.MovePartiallyOutOfBounds (0 ms)
+[ RUN      ] Shape_Tests.MoveOutofBoundsShapeInBound
+[       OK ] Shape_Tests.MoveOutofBoundsShapeInBound (0 ms)
+[----------] 9 tests from Shape_Tests (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 9 tests from 1 test case ran. (1 ms total)
+[  PASSED  ] 9 tests.
+gcov Shape.cpp 2> /dev/null | grep -A 1 Shape.cpp
+File 'Shape.cpp'
+Lines executed:100.00% of 24
+Creating 'Shape.cpp.gcov'
+
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p2> make test_Shape_Collection.cpp [K[K[K[K[K
+g++  -ansi -pedantic-errors -Wall -Wconversion -g  -c -o test_Shape_Collection.o test_Shape_Collection.cpp
+g++ -ansi -pedantic-errors -Wall -Wconversion -g -lgtest -lpthread -lgtest_main -fprofile-arcs -ftest-coverage -c Shape_Collection.cpp
+g++ test_Shape_Collection.o Shape.o Grid.o Shape_Collection.o -fprofile-arcs -ftest-coverage -ansi -pedantic-errors -Wall -Wconversion -g -lgtest -lpthread -lgtest_main -o test_Shape_Collection
+test_Shape_Collection
+Running main() from gtest_main.cc
+[==========] Running 12 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 12 tests from Shape_Collection_Tests
+[ RUN      ] Shape_Collection_Tests.TestShapeCollectionConstructor
+[       OK ] Shape_Collection_Tests.TestShapeCollectionConstructor (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestShapeCollectionAddShape
+[       OK ] Shape_Collection_Tests.TestShapeCollectionAddShape (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestShapeCollectionAddNonExistingShape
+[       OK ] Shape_Collection_Tests.TestShapeCollectionAddNonExistingShape (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestShapeCollectionRemoveExistingShape
+[       OK ] Shape_Collection_Tests.TestShapeCollectionRemoveExistingShape (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestShapeCollectionRemoveNonExistingShape
+[       OK ] Shape_Collection_Tests.TestShapeCollectionRemoveNonExistingShape (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestShapeCollectionLookupExistingShape
+[       OK ] Shape_Collection_Tests.TestShapeCollectionLookupExistingShape (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestShapeCollectionLookupNonExistingShape
+[       OK ] Shape_Collection_Tests.TestShapeCollectionLookupNonExistingShape (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestShapeCollectionLookupEmptyShapeCollection
+[       OK ] Shape_Collection_Tests.TestShapeCollectionLookupEmptyShapeCollection (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestShapeCollectionWriteNamesOnNonEmptyShapeCollection
+[       OK ] Shape_Collection_Tests.TestShapeCollectionWriteNamesOnNonEmptyShapeCollection (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestShapeCollectionWriteNamesOnEmptyShapeCollection
+[       OK ] Shape_Collection_Tests.TestShapeCollectionWriteNamesOnEmptyShapeCollection (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestDrawShapesOnEmptyShapeCollection
+[       OK ] Shape_Collection_Tests.TestDrawShapesOnEmptyShapeCollection (0 ms)
+[ RUN      ] Shape_Collection_Tests.TestDrawShapesOnNonEmptyShapeCollection_
+[       OK ] Shape_Collection_Tests.TestDrawShapesOnNonEmptyShapeCollection_ (0 ms)
+[----------] 12 tests from Shape_Collection_Tests (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test case ran. (0 ms total)
+[  PASSED  ] 12 tests.
+gcov Shape_Collection.cpp 2> /dev/null | grep -A 1 Shape_Collection.cpp
+File 'Shape_Collection.cpp'
+Lines executed:93.75% of 64
+Creating 'Shape_Collection.cpp.gcov'
+
+[ctabe297@ins.mtroyal.ca ~/assignments/asg5/p2> exit
+exit
+
+Script done on 2022-04-08 22:31:21-06:00

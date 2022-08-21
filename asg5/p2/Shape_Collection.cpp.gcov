@@ -1,0 +1,298 @@
+        -:    0:Source:Shape_Collection.cpp
+        -:    0:Graph:Shape_Collection.gcno
+        -:    0:Data:Shape_Collection.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "Shape_Collection.h"
+        -:    2:
+        -:    3:/********************************************************************
+        -:    4: *
+        -:    5: * Name:             Clency Tabe
+        -:    6: * Email:            ctabe297@mtroyal.ca
+        -:    7: * Course:           COMP 1633, 001
+        -:    8: * Due Date:         April 8, 2022
+        -:    9: * Instructor name:  Paul Pospisil
+        -:   10: * File name:        Shape_Collection.cpp
+        -:   11: *
+        -:   12: ********************************************************************/
+        -:   13:
+        -:   14:
+        -:   15:/*********************************************************************
+        -:   16: *
+        -:   17: *  CLASS: Shape_Collection
+        -:   18: *
+        -:   19: *  PURPOSE: A collection of pointers to shape objects.
+        -:   20: *           The order of elements is irrelevant.
+        -:   21: *
+        -:   22: *  PRIVATE DATA MEMBERS:
+        -:   23: *
+        -:   24: *  head - a pointer to the head node of a doubly linked list, NULL if
+        -:   25: *         the list is empty
+        -:   26: *
+        -:   27: *  NOTES:
+        -:   28: *  Each node contains:
+        -:   29: *
+        -:   30: *       - a pointer to the "next" node, NULL for tail node
+        -:   31: *
+        -:   32: *       - a pointer to the "prev" (previous) node, NULL for head node
+        -:   33: *
+        -:   34: *       - shape: a pointer to a dynamically allocated shape object
+        -:   35: *
+        -:   36: *       - name: the name associated with that shape
+        -:   37: *
+        -:   38: *  The list is doubly linked to simplify the implementation of "remove".
+        -:   39: *  The "lookup_node" helper function returns a pointer to a node.  
+        -:   40: *  Therefore, "remove" can simply take this node, unlink it from its 
+        -:   41: *  "prev" and "next" neighbours (if any), and then deallocate.
+        -:   42: *
+        -:   43: *********************************************************************/
+        -:   44:
+        -:   45:/*********************************************************************
+        -:   46: *
+        -:   47: *  FUNCTION: Shape_Collection
+        -:   48: *
+        -:   49: *  PURPOSE: initializes an empty collection.
+        -:   50: *
+        -:   51: *********************************************************************/
+        -:   52:
+       12:   53:Shape_Collection :: Shape_Collection () : head (NULL)
+        -:   54:{
+       12:   55:}
+        -:   56:
+        -:   57:
+        -:   58:/*********************************************************************
+        -:   59: *
+        -:   60: *  FUNCTION: ~Shape_Collection
+        -:   61: *
+        -:   62: *  PURPOSE: deallocates all dynamically allocated
+        -:   63: *           memory by removing all nodes.
+        -:   64: *
+        -:   65: *********************************************************************/
+        -:   66:
+       44:   67:Shape_Collection :: ~Shape_Collection ()
+        -:   68:{
+       32:   69:  while (head != NULL)
+       20:   70:    remove(head->name);
+       12:   71:}
+        -:   72:
+        -:   73:
+        -:   74:/*********************************************************************
+        -:   75: *
+        -:   76: *  FUNCTION: add
+        -:   77: *
+        -:   78: *  PURPOSE: adds the given shape pointer to the collection,
+        -:   79: *           associating it with the given name.
+        -:   80: *
+        -:   81: *  METHOD: - allocate the node
+        -:   82: *          - link it in at the front of the list
+        -:   83: *          - store the shape pointer and name inside
+        -:   84: *
+        -:   85: *  INPUT: shape - a pointer to a dynamically allocated shape
+        -:   86: *         name  - the name to associated with the shape
+        -:   87: *
+        -:   88: *********************************************************************/
+        -:   89:
+       21:   90:void Shape_Collection :: add (Shape* shape, string name)
+        -:   91:{
+       21:   92:  Node* new_node = new Node;
+        -:   93:
+       21:   94:  new_node->next = head;
+       21:   95:  new_node->prev = NULL;
+       21:   96:  new_node->shape = shape;
+       21:   97:  new_node->name = name;
+        -:   98:   
+       21:   99:  if (head != NULL)
+       13:  100:    head->prev = new_node;
+        -:  101:
+       21:  102:  head = new_node;
+       21:  103:}
+        -:  104:
+        -:  105:/*********************************************************************
+        -:  106: *
+        -:  107: *  FUNCTION: remove
+        -:  108: *
+        -:  109: *  PURPOSE: removes the named shape from the collection, if it exists.
+        -:  110: *           The shape object is deallocated.
+        -:  111: *
+        -:  112: *  METHOD: - look up the node
+        -:  113: *          - if it exists:
+        -:  114: *               - if it has a successor, set successor's 
+        -:  115: *                 predecessor to by-pass this node
+        -:  116: *               - if it has a predecessor, set predecessor's
+        -:  117: *                 successor to by-pass this node
+        -:  118: *               - if it has no predecessor (i.e. it was at the
+        -:  119: *                 front of the list) update the head pointer
+        -:  120: *               - deallocate the shape object
+        -:  121: *               - deallocate the node
+        -:  122: *
+        -:  123: *  INPUT: name - the name of the shape to remove
+        -:  124: *
+        -:  125: *********************************************************************/
+        -:  126:
+       22:  127:void Shape_Collection :: remove (string name)
+        -:  128:{
+       22:  129:  Node* gone = lookup_node (name);
+        -:  130:
+       22:  131:  if (gone != NULL)
+        -:  132:    {
+       21:  133:      if (gone->next != NULL)
+       13:  134:	gone->next->prev = gone->prev;
+        -:  135:   
+       21:  136:      if (gone->prev != NULL)
+        1:  137:	gone->prev->next = gone->next;
+        -:  138:      else
+       20:  139:	head = gone->next;
+        -:  140:
+       21:  141:      delete gone->shape;
+       21:  142:      delete gone;
+        -:  143:    }
+       22:  144:}
+        -:  145:
+        -:  146:
+        -:  147:/*********************************************************************
+        -:  148: *
+        -:  149: *  FUNCTION: lookup
+        -:  150: *
+        -:  151: *  PURPOSE: retrieves the pointer to the named shape
+        -:  152: *
+        -:  153: *  INPUT: name - the name of the shape to look up
+        -:  154: *
+        -:  155: *  RETURNS: the pointer, or NULL if no such shape
+        -:  156: *
+        -:  157: *********************************************************************/
+        -:  158:
+        3:  159:Shape* Shape_Collection :: lookup (string name) const
+        -:  160:{
+        3:  161:  Shape* found = NULL;
+        3:  162:  Node* gotit = lookup_node(name);
+        -:  163:
+        3:  164:  if (gotit != NULL)
+        1:  165:    found = gotit->shape;
+        -:  166:
+        3:  167:  return found;
+        -:  168:}
+        -:  169:
+        -:  170:/*********************************************************************
+        -:  171: *
+        -:  172: * FUNCTION: draw_shapes
+        -:  173: * 
+        -:  174: * PURPOSE: draw all shapse in the shape collection on an output stream
+        -:  175: *
+        -:  176: * INPUT: out - an output stream where all all shapes will be printed on
+        -:  177: *
+        -:  178: * OUTPUT: Drawn shapes on given grid
+        -:  179: *
+        -:  180: * RETURN: NONE
+        -:  181: *
+        -:  182: * METHOD: the function creates a Grid where all shapes will be printed
+        -:  183: *         then, a current node traverses the linked list printing all
+        -:  184: *         shapes on that Grid. At the end, the Grid with printed shapes
+        -:  185: *         in outputed through the output stream. 
+        -:  186: *
+        -:  187: *********************************************************************/
+        -:  188:
+       10:  189:void Shape_Collection :: draw_shapes (ostream& out) const
+        -:  190:{
+       10:  191:  Node *curr = head;
+       10:  192:  Grid aGrid;
+        -:  193:  
+       28:  194:  while(curr != NULL)
+        -:  195:    {
+       18:  196:      curr->shape->draw(aGrid);
+       18:  197:      curr = curr->next;
+        -:  198:    }
+       10:  199:  out << aGrid;
+       10:  200:}
+        -:  201:
+        -:  202:/*********************************************************************
+        -:  203: *
+        -:  204: * FUNCTION: write_names
+        -:  205: *
+        -:  206: * PURPOSE:  write names of all the shapes in the shape collection
+        -:  207: *
+        -:  208: * INPUT:    out - an output stream where all all shapes will be printed on
+        -:  209: *
+        -:  210: * OUTPUT: All names of shapse written on given outputstream
+        -:  211: *
+        -:  212: * RETURN: NONE
+        -:  213: *
+        -:  214: * METHOD:   the function goes through the linked list of shapes writing 
+        -:  215: *           each shapes name to the output stream
+        -:  216: *            
+        -:  217: *********************************************************************/
+        -:  218:
+        2:  219:void Shape_Collection :: write_names (ostream& out) const
+        -:  220:{
+        2:  221:  Node *curr = head;
+        -:  222:
+        2:  223:  out << "[";
+        2:  224:  if(curr != NULL){
+        4:  225:    while(curr != NULL)
+        -:  226:      {
+        3:  227:	out << curr->name;
+        3:  228:	if(curr->next != NULL)
+        2:  229:	  out << ",";
+        3:  230:	curr = curr->next;
+        -:  231:      }
+        -:  232:  }
+        2:  233:  out << "]";
+        2:  234:}
+        -:  235:
+        -:  236:/*********************************************************************
+        -:  237:
+        -:  238: *********************************************************************/
+        -:  239:
+    #####:  240:Shape_Collection :: Shape_Collection (const Shape_Collection& orig)
+        -:  241:{
+        -:  242:  // DUMMY IMPLEMENTATION - NOT CALLABLE FROM CLIENT
+    #####:  243:}
+        -:  244:
+        -:  245:
+        -:  246:/*********************************************************************
+        -:  247:
+        -:  248: *********************************************************************/
+        -:  249:
+    #####:  250:Shape_Collection& Shape_Collection :: operator = (const Shape_Collection& rhs)
+        -:  251:{
+        -:  252:  // DUMMY IMPLEMENTATION - NOT CALLABLE FROM CLIENT
+    #####:  253:  return *this;
+        -:  254:}
+        -:  255:
+        -:  256:
+        -:  257:/*********************************************************************
+        -:  258: *
+        -:  259: *  FUNCTION: lookup_node
+        -:  260: *
+        -:  261: *  PURPOSE: looks up the node with the given name
+        -:  262: *
+        -:  263: *  METHOD: sequential search algorithm
+        -:  264: *
+        -:  265: *  INPUT: name - the name of the shape to look up
+        -:  266: *
+        -:  267: *  RETURNS: a pointer to the node containing the named shape, NULL
+        -:  268: *           if not found
+        -:  269: *
+        -:  270: *  REMARKS:
+        -:  271: *      Node is defined in the private data area of the Shape_Collection
+        -:  272: *      class. As a consequence, when it is returned directly, its 
+        -:  273: *      "location" must be resolved by using the scope operator as a
+        -:  274: *      prefix
+        -:  275: *      i.e.  return type of Shape_Collection::Node*
+        -:  276: *            says "you can find this definition in
+        -:  277: *            the Shape_Collection class"
+        -:  278: *********************************************************************/
+        -:  279:
+       25:  280:Shape_Collection::Node* Shape_Collection :: lookup_node (string name) const
+        -:  281:{
+       25:  282:  bool found = false;
+       25:  283:  Node* curr = head;
+        -:  284:
+       53:  285:  while (!found && curr != NULL)
+        -:  286:    {
+       28:  287:      if (curr->name == name)            // can use with C++ string class
+       22:  288:	found = true;
+        -:  289:      else
+        6:  290:	curr = curr->next;
+        -:  291:    }
+       25:  292:  return curr;
+        -:  293:}

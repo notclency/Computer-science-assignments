@@ -30,3 +30,8 @@ explain the concepts of and develop programs which use:
 -  recursion
 -  classes and objects
 -  lists, stacks, and queues
+
+ASSIGNMNETS OVERVIEW:
+-  Programming assignments will be written in C++ using the INS Linux server (ins.mtroyal.ca)
+-  Assignments 1-4 are writen in c++
+-  Each assignment folder has it "assignment specifications" containing detailed explanations and requirements about the assignment.

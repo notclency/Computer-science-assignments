@@ -35,4 +35,4 @@ ASSIGNMNETS OVERVIEW:
 -  Programming assignments will be written in C++ using the INS Linux server (ins.mtroyal.ca)
 -  Assignments 1-4 are writen in C++
 -  Typescript files are recorded assignment submissions
--  Each assignment folder has it "assignment specifications" containing detailed explanations and requirements about the assignment.
+-  Each assignment folder has its "assignment specifications" containing detailed explanations and requirements about the assignment.
